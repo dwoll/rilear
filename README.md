@@ -8,7 +8,7 @@ R package for assessing the lifetime excess absolute risk from radiation exposur
 
 ## Goals
 
-A similar tool like [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/), even `rilear` will not be as sophisticated, but maybe more flexible and useful for certain applications. Detailed goals:
+A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/), even if `rilear` will not be as sophisticated. However, it may be more flexible and useful for certain applications. Detailed goals:
 
  - Implement lifetime risk measures LEAR / LAR / CER, REID / REIC, ELR, RADS
  - Multiple exposure events, each with own dose distribution
