@@ -1,16 +1,22 @@
 # rilear
+
+**CAVE** All calculations are preliminary, there has been no validation as of now.
+
 ## Background
 
 R package for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events with acute (high dose rate) or protracted (low dose rate) exposure.
 
-Monte Carlo methods for assessing uncertainty for risk model coefficient estimates, dose distribution, ERR-EAR weights for risk transfer, DDREF, and the latency function.
+## Goals
+
+A similar tool like [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/), even `rilear` will not be as sophisticated, but maybe more flexible and useful for certain applications. Detailed goals:
+
+ - Implement lifetime risk measures LEAR / LAR / CER, REID / REIC, ELR, RADS
+ - Multiple exposure events, each with own dose distribution
+ - Monte Carlo methods for assessing uncertainty for risk model coefficient estimates, dose distribution, ERR-EAR weights for risk transfer, DDREF, and the latency function.
+ - Possibility to define ERR / EAR risk models for cancer sites and flexibly use these models for risk calculation
+ - Possibility to use own data for baseline cancer (mortality) rates, baseline overall mortality
+ - Possibility to calculate expected lifetime excess cancer risk for a whole exposed population.
  
-Informed by methods developed for NCI RadRAT and BfS ProZES.
-
-Currently limited to these outcomes: All solid cancer, breast cancer, leukemia / lymphoma.
-
-Input data for Germany included: Baseline cancer rates, mortality rates, population size on different regional levels. Custom input data for other regions can be used.
-
 ## Input data
 
   - ERR / EAR risk models: excess risk function, parameter estimates & covariance matrix
