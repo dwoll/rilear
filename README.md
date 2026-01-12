@@ -12,10 +12,10 @@ A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/),
 
  - Implement lifetime risk measures LEAR / LAR / CER, REID / REIC, ELR, RADS
  - Multiple exposure events, each with own dose distribution
- - Monte Carlo methods for assessing uncertainty for risk model coefficient estimates, dose distribution, ERR-EAR weights for risk transfer, DDREF, and the latency function.
+ - Monte Carlo methods for assessing uncertainty for risk model coefficient estimates, dose distribution, ERR-EAR weights for risk transfer, DDREF, and the latency function
  - Possibility to define ERR / EAR risk models for cancer sites and flexibly use these models for risk calculation
  - Possibility to use own data for baseline cancer (mortality) rates, baseline overall mortality
- - Possibility to calculate expected lifetime excess cancer risk for a whole exposed population.
+ - Possibility to calculate expected lifetime excess cancer risk for a whole exposed population, including expected absolute number of cases
  
 ## Input data
 
