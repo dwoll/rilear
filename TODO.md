@@ -1,6 +1,7 @@
 ## TODO
 
   * Default "fixed" for dose distribution, default ddref=1
+  * Separate DDREF for each exposure event
   * Dose rate
   * REIC: calc excess cancer mortality for Surv_E even for REIC?
   * Smooth rates instead of interpolate?
