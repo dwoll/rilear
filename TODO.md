@@ -1,12 +1,13 @@
 ## TODO
 
+  * Automatically calculate risks for several / all available cancer sites / risk models
   * Default "fixed" for dose distribution, default ddref=1
   * Separate DDREF for each exposure event
-  * Dose rate
+  * Consider dose and dose rate to select DDREF
   * REIC: calc excess cancer mortality for Surv_E even for REIC?
   * Smooth rates instead of interpolate?
   * Validate using ProZES, RadRAT, LARisk
-  * Convenience function cancer="all_solid", outcome="incidence", region="Germany"
+  * Convenience function cancer="all_solid", outcome="incidence", region="Germany", "dose_rate=acute"
   * More detailed uncertainty for parameters following ProZES / RadRAT
   * Leukemia / lymphoma mortality model
   * Breast cancer mortality model

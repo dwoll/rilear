@@ -6,13 +6,15 @@ Calculate the lifetime excess absolute cancer risk for a population of persons w
 }
 \usage{
 get_elr_pop(x, exposure, stratify_sex = FALSE, pop_ref = 100000,
-            multicore = FALSE, n_cores_max = 10L, n_cores_omit = 2L, ...)
+            alpha = 0.05, multicore = FALSE, n_cores_max = 10L,
+            n_cores_omit = 2L, ...)
 }
 \arguments{
   \item{x}{A data frame defining the exposed population. Needs variables \code{age_n} with the numeric age, \code{sex} - a factor with levels \code{"f"} and \code{"m"}, and \code{pop} for the population size. For an example, see \code{\link{d_pop_ger_fedstate_2024L}}.}
   \item{exposure}{A list defining the exposure events with one component for each such event. Each component defining a single exposure event is a list with components \code{timing} for the years of exposure following the age given in \code{x}, \code{distr} for the dose distribution class, and \code{param} with the parameters necessary to specify the dose distribution. See \code{\link{gen_exposure}} - a utility function that may be used to create such a list.}
   \item{stratify_sex}{Report number of expected cases separately for men and women?}
   \item{pop_ref}{Report number of expected cases per \code{pop_ref} persons.}
+  \item{alpha}{Statistical significance level defining the width of the confidence interval as 1 - alpha.}
   \item{multicore}{Do multicore parallel processing?}
   \item{n_cores_max}{Maximum number of cores to use in multicore processing. See \code{\link[parallelly]{availableCores}}.}
   \item{n_cores_omit}{Number of cores not to use in multicore parallel processing. See \code{\link[parallelly]{availableCores}}.}

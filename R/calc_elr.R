@@ -1,7 +1,6 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
-## Calculate the excess lifetime risk due to radiation exposure
-## bespoke assessment for members of given population
+## Calculate the lifetime excess absolute risk due to radiation exposure
 ## metrics: LAR / LEAR / CER, REID / REIC, ELR, RADS
 ## background
 ## Ulanowski et al. Radiat Environ Biophys 2020. DOI 10.1007/s00411-020-00866-7

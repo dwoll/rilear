@@ -1,8 +1,8 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
-## Calculate the excess lifetime risk due to radiation exposure
+## Calculate the lifetime excess absolute risk due to radiation exposure
 ## simulate parameters that have uncertainty
-## generate MC distribution of excess lifetime risk from sets of parameters
+## generate MC distribution of lifetime excess risk from sets of parameters
 ## then either aggregate to mean, median, CI, or return all MC results
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
@@ -14,6 +14,10 @@
 get_elr_batch <- function(x, lat_method, ...) {
     lapply(x, get_elr, lat_method=lat_method, ...)
 }
+
+#####---------------------------------------------------------------------------
+## function for MC simulation and collection of excess lifetime risk values
+#####---------------------------------------------------------------------------
 
 get_elr_mc <- function(## parameters with uncertainty
                        exposure,
@@ -101,7 +105,7 @@ get_elr_mc <- function(## parameters with uncertainty
     stopifnot(all(wt_transfer_err >= 0),
               all(wt_transfer_err <= 1))
     
-    wt_transfer_mc <- cbind(ERR=wt_transfer_err,
+    wt_transfer_mc <- cbind(ERR=  wt_transfer_err,
                             EAR=1-wt_transfer_err)
 
     #####-----------------------------------------------------------------------

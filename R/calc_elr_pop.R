@@ -1,6 +1,6 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
-## Calculate the excess lifetime risk due to radiation exposure
+## Calculate the lifetime excess absolute risk due to radiation exposure
 ## for a complete population
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
@@ -80,6 +80,7 @@ get_elr_pop <- function(x,
                         exposure,
                         stratify_sex=FALSE,
                         pop_ref     =100000,
+                        alpha       =0.05,
                         multicore   =FALSE,
                         n_cores_max =10L,
                         n_cores_omit=2L,
@@ -99,9 +100,9 @@ get_elr_pop <- function(x,
         l_elr_batch <- parallel::parLapply(cl,
                                            x_spl,
                                            get_elr_pop_batch1,
-                                           exposure=exposure,
+                                           exposure =exposure,
                                            multicore=FALSE,
-                                           aggr_mc=FALSE,
+                                           aggr_mc  =FALSE,
                                            ...)
         parallel::stopCluster(cl)
         do.call(c, l_elr_batch)
@@ -112,9 +113,9 @@ get_elr_pop <- function(x,
         ## collect all MC results here
         lapply(x_spl,
                get_elr_pop1,
-               exposure=exposure,
+               exposure =exposure,
                multicore=FALSE,
-               aggr_mc=FALSE,
+               aggr_mc  =FALSE,
                ...)
     }
     
@@ -131,7 +132,7 @@ get_elr_pop <- function(x,
         weights    <- d_elr[["pop"]][idx] / pop_total
         m_mc_wt    <- weights*m_mc[idx, ]  ## works because cyclic + col-wise
         elr_rsk    <- colSums(m_mc_wt, na.rm=TRUE)
-        elr_rsk_ci <- unname(quantile(elr_rsk, probs=c(0.025, 0.975)))
+        elr_rsk_ci <- unname(quantile(elr_rsk, probs=c(alpha/2, 1 - (alpha/2))))
         mean_rsk   <- mean(elr_rsk)
         median_rsk <- median(elr_rsk)
         
