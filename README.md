@@ -4,11 +4,11 @@
 
 ## Background
 
-R package for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events with acute (high dose rate) or protracted (low dose rate) exposure.
+R package for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events and simultaneous application to a whole population to project total number of expected cancer cases.
 
 ## Goals
 
-A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/), even if `rilear` will not be as sophisticated. However, it may be more flexible and useful for certain applications. Detailed goals:
+A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/) and [LARisk](https://cran.r-project.org/package=LARisk), even if `rilear` will not be as sophisticated. However, it may be more flexible and useful for certain applications. Detailed goals:
 
  - Implement lifetime risk measures LEAR / LAR / CER, REID / REIC, ELR, RADS
  - Multiple exposure events, each with own dose distribution
@@ -75,3 +75,4 @@ Interpolated for individual years of age.
   - RadRAT: Berrington de Gonzalez et al. JRP 2012. DOI: 10.1088/0952-4746/32/3/205
   - Sasaki et al. J Radiat Prot Res 2023 DOI: 10.14407/jrpr.2022.00213
   - Walsh et al. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0
+  - LARisk: Lee et al. DOI: 10.32614/CRAN.package.LARisk
