@@ -1,0 +1,21 @@
+importFrom(stats,
+           as.formula, lag, lm, median, predict, quantile, rbeta,
+           reshape, rlnorm, rnorm, runif, setNames, splinefun,
+           weighted.mean)
+importFrom(utils, head, tail, hasName)
+importFrom(parallel, clusterEvalQ, makeCluster, parLapply, stopCluster)
+importFrom(parallelly, availableCores)
+importFrom(mvtnorm, rmvnorm)
+importFrom(dplyr, mutate, filter, bind_rows, bind_cols, if_else)
+
+export(gen_exposure,
+       get_elr,
+       get_elr_mc,
+       get_elr_pop,
+       interpol_cancer_rate,
+       interpol_mort_rate,
+       rm_solid_incid_sumray,
+       rm_solid_mort_sumray,
+       rm_solid_incid_walsh2021,
+       rm_breast_incid_walsh2021,
+       rm_leuk_incid_walsh2021)

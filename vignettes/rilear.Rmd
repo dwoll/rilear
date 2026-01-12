@@ -1,0 +1,133 @@
+---
+title: "rilear: Lifetime Excess Absolute Risk"
+output: rmarkdown::html_vignette
+description: >
+  Show how rilear can be used to calculate lifetime
+  excess absolute risk measures based on ERR / EAR
+  radiation risk models.
+vignette: >
+  %\VignetteIndexEntry{rilear: Lifetime Excess Absolute Risk}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse=TRUE, comment="#")
+```
+
+```{r}
+library(rilear)
+```
+
+# Single exposed person
+## Without uncertainty
+
+```{r}
+## ERR / EAR risk models for solid cancer incidence and mortality
+rm_incid <- rm_solid_incid_walsh2021()
+rm_mort  <- rm_solid_mort_sumray()
+
+## single point estimate after two exposures at age 20, 21
+get_elr(l_param=list(exposure      =list(dose=c(0.5, 0.7),
+                                         agex=c(20, 21)),
+                     param_err     =rm_incid$err$param,
+                     param_ear     =rm_incid$ear$param,
+                     param_err_mort=rm_mort$err$param,
+                     param_ear_mort=rm_mort$ear$param,
+                     wt_transfer   =c(ERR=0.5, EAR=0.5),
+                     ddref         =1,
+                     lat_t0        =5,
+                     lat_eta       =6.25),
+        sex               ="f",
+        risk_model        =rm_incid,
+        risk_model_mort   =rm_mort,
+        d_base_cancer     =d_cancer_ger_incid_solidW_i,
+        d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+        d_base_mort       =d_lifetable_ger_2024W,
+        age_max           =95,
+        lat_method        ="ProZES",
+        metric            ="LEAR")
+```
+
+## With uncertainty
+
+```{r}
+## ERR / EAR risk models for solid cancer incidence and mortality
+rm_incid <- rm_solid_incid_walsh2021()
+rm_mort  <- rm_solid_mort_sumray()
+
+## generate list of 2 exposure events
+expo_event <- gen_exposure(n    =2,
+                           agex =c(20, 21),
+                           distr=c("normal", "triangular"),
+                           param=list(c(mean=0.5, sd=0.05),
+                                      c(mode=0.5, min=0.1, max=0.6)))
+
+get_elr_mc(## parameters with uncertainty
+           exposure          =expo_event,
+           wt_transfer       =c(ERR=0.5, EAR=0.5),
+           wt_transfer_fixed =FALSE,
+           ddref             =1,
+           ddref_fixed       =TRUE,
+           lat_t0            =5,
+           lat_eta           =6.25,
+           lat_method        ="ProZES",
+           lat_fixed         =FALSE,
+           ## parameters without uncertainty
+           sex               ="f",
+           risk_model        =rm_incid,
+           risk_model_mort   =rm_mort,
+           d_base_cancer     =d_cancer_ger_incid_solidW_i,
+           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+           d_base_mort       =d_lifetable_ger_2024W,
+           alpha             =0.05,
+           age_max           =95,
+           metric            ="REIC",
+           n_sim             =100L,
+           multicore         =FALSE,
+           n_cores_max       =10L,
+           n_cores_omit      =2L,
+           aggr_mc           =TRUE)
+```
+
+# Whole exposed population
+
+```{r}
+## ERR / EAR risk models for solid cancer incidence and mortality
+rm_incid <- rm_solid_incid_walsh2021()
+rm_mort  <- rm_solid_mort_sumray()
+
+## generate list of 2 exposure events in consecutive years
+expo_event <- gen_exposure(n     =2,
+                           timing=c(0, 1),
+                           distr =c("normal", "triangular"),
+                           param =list(c(mean=0.5, sd=0.05),
+                                       c(mode=0.5, min=0.1, max=0.6)))
+
+## risk estimates for exposure of the population of Germany
+get_elr_pop(d_pop_ger_country_2024L,
+            exposure          =expo_event,
+            wt_transfer       =c(ERR=0.5, EAR=0.5),
+            wt_transfer_fixed =FALSE,
+            ddref             =1,
+            ddref_fixed       =TRUE,
+            lat_t0            =5,
+            lat_eta           =6.67,
+            lat_method        ="ProZES",
+            lat_fixed         =FALSE,
+            n_sim             =100L,
+            ##
+            risk_model        =rm_incid,
+            risk_model_mort   =rm_mort,
+            d_base_cancer     =d_cancer_ger_incid_solidW_i,
+            d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+            d_base_mort       =d_lifetable_ger_2024W,
+            metric            ="LEAR",
+            age_max           =95,
+            ##
+            multicore         =FALSE,
+            n_cores_max       =10L,
+            n_cores_omit      =2L,
+            stratify_sex      =TRUE,
+            pop_ref           =100000)
+```
