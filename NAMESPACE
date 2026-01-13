@@ -6,11 +6,13 @@ importFrom(utils, head, tail, hasName)
 importFrom(parallel, clusterEvalQ, makeCluster, parLapply, stopCluster)
 importFrom(parallelly, availableCores)
 importFrom(mvtnorm, rmvnorm)
-importFrom(dplyr, mutate, filter, bind_rows, bind_cols, if_else)
+importFrom(dplyr,
+           arrange, bind_cols, bind_rows, filter, group_by, if_else,
+           left_join, mutate, n, select, summarize, ungroup)
 
 export(gen_exposure,
-       get_elr,
-       get_elr_mc,
+       get_elr1,
+       get_elr1_mc,
        get_elr_pop,
        interpol_cancer_rate,
        interpol_mort_rate,

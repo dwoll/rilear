@@ -42,7 +42,7 @@ All stratified by sex, age group. Interpolated for individual years of age.
   - `d_cancer_ger_incid_solidW_i`: Solid cancer incidence Germany 2023 - excluding C44 ([RKI](https://www.krebsdaten.de/))
   - `d_cancer_ger_incid_solid_c44W_i`: Solid cancer incidence Germany 2023 - including C44 ([RKI](https://www.krebsdaten.de/))
   - `d_cancer_ger_incid_breastW_i`: Breast cancer incidence Germany 2023 ([RKI](https://www.krebsdaten.de/))
-  - `d_cancer_ger_incid_leuk_lymphW_i`: Leukemia / lymphoma incidence Germany 2023 - including CLL (C91.1, C91.4) / ATL (C91.5)([RKI](https://www.krebsdaten.de/))
+  - `d_cancer_ger_incid_leuk_lymphW_i`: Leukemia / lymphoma incidence Germany 2023 - including CLL (C91.1, C91.4) / ATL (C91.5) ([RKI](https://www.krebsdaten.de/))
 
 ## Mortality
 

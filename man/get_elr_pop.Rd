@@ -18,7 +18,7 @@ get_elr_pop(x, exposure, stratify_sex = FALSE, pop_ref = 100000,
   \item{multicore}{Do multicore parallel processing?}
   \item{n_cores_max}{Maximum number of cores to use in multicore processing. See \code{\link[parallelly]{availableCores}}.}
   \item{n_cores_omit}{Number of cores not to use in multicore parallel processing. See \code{\link[parallelly]{availableCores}}.}
-  \item{...}{All remaining arguments that need to be passed on to \code{\link{get_elr_mc}} and \code{\link{get_elr}}: \code{wt_transfer}, \code{wt_transfer_fixed}, \code{ddref}, \code{ddref_fixed}, \code{lat_t0}, \code{lat_eta}, \code{lat_method}, \code{lat_fixed}, \code{alpha}, \code{cancer}, \code{n_sim}, \code{risk_model}, \code{risk_model_mort}, \code{d_base_cancer}, \code{d_base_cancer_mort}, \code{d_base_mort}, \code{age_max}, \code{metric}.}
+  \item{...}{All remaining arguments that need to be passed on to \code{\link{get_elr1_mc}} and \code{\link{get_elr1}}: \code{wt_transfer}, \code{wt_transfer_fixed}, \code{ddref}, \code{ddref_fixed}, \code{lat_t0}, \code{lat_eta}, \code{lat_method}, \code{lat_fixed}, \code{alpha}, \code{cancer}, \code{n_sim}, \code{risk_model}, \code{risk_model_mort}, \code{d_base_cancer}, \code{d_base_cancer_mort}, \code{d_base_mort}, \code{age_max}, \code{metric}.}
 }
 \value{
 A data frame with variables \code{sex}, \code{pop}, \code{pop_ref}, \code{mean_rsk}, \code{median_rsk}, \code{CIlo_rsk}, \code{CIup_rsk}, \code{mean_abs}, \code{median_abs}, \code{CIlo_abs}, \code{CIup_abs}, \code{mean_ref}, \code{median_ref}, \code{CIlo_ref}, \code{CIup_ref}. Here, variables \code{_rsk} report the risk, \code{_abs} the absolute number of expected cases given the population defined in \code{x}, and \code{_ref} the absolute number of cases per defined reference population size \code{pop_ref}.
@@ -26,14 +26,14 @@ A data frame with variables \code{sex}, \code{pop}, \code{pop_ref}, \code{mean_r
 \details{
 CAVE: All calculations preliminary, not yet validated!
 
-See \code{\link{get_elr_mc}} for the implementation of Monte Carlo methods for estimating the uncertainty of the lifetime risk estimate.
+See \code{\link{get_elr1_mc}} for the implementation of Monte Carlo methods for estimating the uncertainty of the lifetime risk estimate.
 }
 \references{
 .
 }
 \seealso{
-\code{\link{get_elr}},
-\code{\link{get_elr_mc}},
+\code{\link{get_elr1}},
+\code{\link{get_elr1_mc}},
 \code{\link{gen_exposure}},
 \code{\link{d_pop_ger_fedstate_2024L}}
 }
