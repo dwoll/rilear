@@ -1,6 +1,5 @@
 ## TODO
 
-  * CI from a posteriori distribution for population simulation (prediction intervals)
   * Reverse order of MC and population aggregation: Calculate all ages, f, m for same MC run
   * Automatically calculate risks for several / all available cancer sites / risk models
   * Default "fixed" for dose distribution, default ddref=1
