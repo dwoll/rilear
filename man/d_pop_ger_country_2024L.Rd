@@ -18,7 +18,7 @@ Population Germany in 2024. Data frame in long format with respect to sex.}
 Data source: Destatis table 12621-0001 \url{https://www-genesis.destatis.de/}
 }
 \seealso{
-\code{\link{get_elr_pop}},
+\code{\link{get_lear_pop}},
 \code{\link{d_pop_ger_district_2024L}},
 \code{\link{d_pop_ger_fedstate_2024L}}
 }

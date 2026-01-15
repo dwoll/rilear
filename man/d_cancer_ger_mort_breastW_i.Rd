@@ -18,7 +18,8 @@ Data source: Robert Koch Institute (RKI) \url{https://www.krebsdaten.de/}
 }
 \seealso{
 \code{\link{interpol_cancer_rate}},
-\code{\link{get_elr}},
+\code{\link{get_lear_1}},
+\code{\link{get_lear_pop}},
 \code{\link{d_cancer_ger_incid_solidW_i}},
 \code{\link{d_cancer_ger_incid_solid_c44W_i}},
 \code{\link{d_cancer_ger_incid_breastW_i}},

@@ -2,6 +2,10 @@
 #####---------------------------------------------------------------------------
 ## Calculate the lifetime excess absolute risk due to radiation exposure
 ## for a complete population
+##
+## Deprecated functions - use get_elr_pop() instead
+## this version has the wrong order of MC rund and population with different
+## sets of parameters for different agex values
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 
@@ -13,7 +17,7 @@
 ## here: exposure = list of lists(timing, distr, param)
 ## in call to get_elr1_mc():
 ## exposure = list of lists(agex, distr, param)
-get_elr_pop1 <- function(x, exposure, ...) {
+deprecated_get_elr_pop1_mc <- function(x, exposure, ...) {
     stopifnot(nrow(x) == 1L)
     
     dots    <- list(...)
@@ -64,9 +68,9 @@ get_elr_pop1 <- function(x, exposure, ...) {
 ## = multiple rows of a population data set
 #####---------------------------------------------------------------------------
 
-get_elr_pop_batch1 <- function(x, ...) {
+deprecated_get_elr_pop_batch1 <- function(x, ...) {
     x_spl <- split(x, seq_len(nrow(x)))
-    l_out <- lapply(x_spl, get_elr_pop1, ...)
+    l_out <- lapply(x_spl, deprecated_get_elr_pop1_mc, ...)
     bind_rows(l_out)
 }
 
@@ -77,7 +81,7 @@ get_elr_pop_batch1 <- function(x, ...) {
 ## exposure: list of lists(timing, distr, param)
 #####---------------------------------------------------------------------------
 
-get_elr_pop <- function(x,
+deprecated_get_elr_pop <- function(x,
                         exposure,
                         stratify_sex=FALSE,
                         pop_ref     =100000,
@@ -100,13 +104,12 @@ get_elr_pop <- function(x,
         ## collect all MC results here
         l_elr_batch <- parallel::parLapply(cl,
                                            x_spl,
-                                           get_elr_pop_batch1,
+                                           deprecated_get_elr_pop_batch1,
                                            exposure =exposure,
                                            multicore=FALSE,
                                            aggr_mc  =FALSE,
                                            ...)
         parallel::stopCluster(cl)
-        
         bind_rows(l_elr_batch)
     } else {
         ## split population by row
@@ -114,7 +117,7 @@ get_elr_pop <- function(x,
         
         ## collect all MC results here
         lapply(x_spl,
-               get_elr_pop1,
+               deprecated_get_elr_pop1_mc,
                exposure =exposure,
                multicore=FALSE,
                aggr_mc  =FALSE,

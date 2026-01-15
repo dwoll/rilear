@@ -20,7 +20,7 @@ Population in districts in Germany in 2017. Data frame in long format with respe
 Data source: Destatis table 12411-04-02-4 \url{https://www.regionalstatistik.de/}
 }
 \seealso{
-\code{\link{get_elr_pop}},
+\code{\link{get_lear_pop}},
 \code{\link{d_pop_ger_country_2024L}},
 \code{\link{d_pop_ger_fedstate_2024L}}
 }

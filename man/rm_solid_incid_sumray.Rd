@@ -24,7 +24,8 @@ Sasaki et al. SUMRAY: R and Python Codes for Calculating Cancer Risk Due to Radi
 \url{https://github.com/JapanHealthPhysicsSociety/SUMRAY/blob/main/R/R/RiskModel_LSSAllSolidCancerIncidence.r}
 }
 \seealso{
-\code{\link{get_elr}},
+\code{\link{get_lear_1}},
+\code{\link{get_lear_pop}},
 \code{\link{rm_solid_incid_walsh2021}},
 \code{\link{rm_breast_incid_walsh2021}},
 \code{\link{rm_leuk_incid_walsh2021}},

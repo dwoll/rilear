@@ -8,12 +8,10 @@ importFrom(parallelly, availableCores)
 importFrom(mvtnorm, rmvnorm)
 importFrom(dplyr,
            arrange, bind_cols, bind_rows, filter, group_by, if_else,
-           left_join, mutate, n, select, summarize, ungroup)
+           left_join, mutate, n, rename, select, summarize, ungroup)
 
 export(gen_exposure,
-       get_elr1,
-       get_elr1_mc,
-       get_elr_pop,
+       get_lear_1, get_lear1_pop, get_lear1_pop1, get_lear_pop,
        interpol_cancer_rate,
        interpol_mort_rate,
        rm_solid_incid_sumray,

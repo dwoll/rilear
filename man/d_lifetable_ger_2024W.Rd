@@ -29,7 +29,8 @@ Lifetable Germany based on data from 2022-2024.}
 Data source: Destatis table 12621-0001 \url{https://www-genesis.destatis.de/}
 }
 \seealso{
-\code{\link{get_elr}},
+\code{\link{get_lear_1}},
+\code{\link{get_lear_pop}},
 \code{\link{d_mort_rate_ger_country_2024W_i}},
 \code{\link{d_mort_rate_ger_district_2017W_i}},
 \code{\link{d_mort_rate_ger_fedstate_2017W_i}}
