@@ -73,7 +73,7 @@ sim_dose <- function(x, n_sim, ddref_fixed=FALSE) {
     dose_param  <- x[["dose_param"]]
     dose_rate   <- x[["dose_rate"]]
     ddref       <- x[["ddref"]]
-    agex_timing <- if(hasName(x, "age")) { x[["agex"]] } else { x[["timing"]] }
+    agex_timing <- if(hasName(x, "agex")) { x[["agex"]] } else { x[["timing"]] }
     
     if(!(dose_distr %in% dose_distr_have)) {
         stop(paste("x$dose_distr must be one of", 

@@ -58,10 +58,22 @@ rilear:::gen_param_mc(n_sim=10,
 ## solid cancer
 #####---------------------------------------------------------------------------
 
+d_pop_frankfurt <- d_pop_ger_district_2024L |>
+    dplyr::filter(ags == "06412")
+
+# d_pop_ger_country_2024L
+
 ## with cancer mortality
-get_lear_pop(x=d_pop_ger_country_2024L,
-             n_sim             =100L,
-             exposure          =expo_event,
+library(rilear)
+get_lear_pop(x       =d_pop_frankfurt,
+             n_sim   =10000L,
+             exposure=gen_exposure(n     =1,
+                                   timing=1,
+                                   ddref =1,
+                                   dose_rate ="acute",
+                                   dose_distr="normal",
+                                   dose_param=list(c(mean=0.1,
+                                                     sd=0.05))),
              wt_transfer       =c(ERR=0.5, EAR=0.5),
              lat_t0            =5,
              lat_eta           =6,
@@ -69,23 +81,25 @@ get_lear_pop(x=d_pop_ger_country_2024L,
              lat_fixed         =FALSE,
              wt_transfer_fixed =FALSE,
              ddref_fixed       =FALSE,
-             ##
              risk_model        =rm_solid_incid_walsh2021(),
              risk_model_mort   =rm_solid_mort_sumray(),
-             ##
-             stratify_sex      =FALSE,
-             pop_ref           =10000,
+             stratify_sex      =TRUE,
+             pop_ref           =100000,
              alpha             =0.05,
              multicore         =TRUE,
              n_cores_max       =10L,
              n_cores_omit      =2L,
-             ##
              d_base_cancer     =d_cancer_ger_incid_solidW_i,
              d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
              d_base_mort       =d_lifetable_ger_2024W,
-             metric            =c("lear", "RADS"),
-             ##
-             age_max           =90)
+             metric            =c("LEAR", "RADS"),
+             age_max           =90) |>
+    as.data.frame()|>
+    dplyr::select(metric, sex, pop, everything(),
+                  -median_rsk, -median_abs,
+                  -pop_ref, -median_rsk, -CIlo_rsk, -CIup_rsk,
+                  -median_abs,
+                  -mean_ref, -median_ref, -PIlo_ref, -PIup_ref)
 
 ## without cancer mortality
 get_lear_pop(x=d_pop_ger_country_2024L,

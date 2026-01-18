@@ -14,7 +14,7 @@ get_lear1_pop1 <- function(x,
                            l_param,
                            age_max,
                            metric,
-                           ## only passed throught to get_lear_1()
+                           ## only passed throught to get_lear1()
                            # risk_model,
                            # risk_model_mort,
                            # d_base_cancer,
@@ -34,18 +34,18 @@ get_lear1_pop1 <- function(x,
         l_param[["exposure"]][["agex"]] <- x[["age_n"]] +
                                            l_param[["exposure"]][["agex_timing"]]
 
-        m_elr <- get_lear_1(l_param,
-                            sex               =as.character(x[["sex"]]),
-                            age_max           =age_max,
-                            metric            =metric,
-                            ## only passed throught to get_lear_1()
-                            # risk_model        =risk_model,
-                            # risk_model_mort   =risk_model_mort,
-                            # d_base_cancer     =d_base_cancer,
-                            # d_base_cancer_mort=d_base_cancer_mort,
-                            # d_base_mort       =d_base_mort,
-                            # lat_method        =lat_method
-                            ...)
+        m_elr <- get_lear1(l_param,
+                           sex    =as.character(x[["sex"]]),
+                           age_max=age_max,
+                           metric =metric,
+                           ## only passed throught to get_lear1()
+                           # risk_model        =risk_model,
+                           # risk_model_mort   =risk_model_mort,
+                           # d_base_cancer     =d_base_cancer,
+                           # d_base_cancer_mort=d_base_cancer_mort,
+                           # d_base_mort       =d_base_mort,
+                           # lat_method        =lat_method
+                           ...)
         
         ## data frame in long format with respect to metric
         bind_cols(x, metric=metric, value=c(m_elr))
@@ -96,7 +96,7 @@ get_lear_pop <- function(x,        # population
                          multicore        =FALSE,
                          n_cores_max      =10L,
                          n_cores_omit     =2L,
-                         ## passed throught to get_lear_1()
+                         ## passed throught to get_lear1()
                          # age_max,
                          # lat_method       =c("ProZES", "RadRAT"),
                          # d_base_cancer,
@@ -136,7 +136,7 @@ get_lear_pop <- function(x,        # population
         ## make n_cores batches of rows from population data set
         cl <- parallel::makeCluster(n_cores)
         l_param_spl <- split(l_param, seq_along(l_param) %% n_cores)
-        parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear_1"))
+        parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear1"))
         parallel::clusterEvalQ(cl, library(rilear))
         
         ## collect all MC results here

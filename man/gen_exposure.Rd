@@ -29,7 +29,7 @@ A list with one component for each exposure event. Each such component is a list
 .
 }
 \seealso{
-\code{\link{get_lear_1}},
+\code{\link{get_lear1}},
 \code{\link{get_lear_pop}}
 }
 \examples{

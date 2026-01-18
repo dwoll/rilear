@@ -22,7 +22,7 @@ gen_exposure <- function(n,
     dose_rate  <- match.arg(dose_rate,  several.ok=TRUE)
     
     if(!inherits(dose_param, "list")) {
-        dose_param <- rep(as.list(dose_param), n)
+        dose_param <- rep(list(dose_param), n)
     } else if(inherits(dose_param, "list") && (length(dose_param) < n)) {
         dose_param <- rep(dose_param, n)
     }
@@ -52,7 +52,7 @@ gen_exposure <- function(n,
             list(agex      =agex[i],
                  dose_distr=dose_distr[i],
                  dose_param=dose_param[[i]],
-                 dose_rate =dose_rate,
+                 dose_rate =dose_rate[i],
                  ddref     =ddref[i])
         })
     } else if(!missing(timing) && missing(agex)) {

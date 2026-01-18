@@ -19,7 +19,7 @@ Data source: Destatis table 12411-0013 (population) and 12613-02-02-4-B (mortali
 }
 \seealso{
 \code{\link{interpol_mort_rate}},
-\code{\link{get_lear_1}},
+\code{\link{get_lear1}},
 \code{\link{get_lear_pop}},
 \code{\link{d_lifetable_ger_2024W}},
 \code{\link{d_mort_rate_ger_country_2024W_i}},
