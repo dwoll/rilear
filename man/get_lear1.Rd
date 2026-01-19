@@ -5,11 +5,11 @@
 Calculate the lifetime excess absolute cancer risk for a single person with radiation exposure. Supports multiple exposure events. Calculates risk metrics LAR / LEAR / CER, REID / REIC, ELR, and RADS. Low-level function for a calculation without considering uncertainty.
 }
 \usage{
-get_lear(l_param, sex = c("f", "m"), risk_model, risk_model_mort,
-         d_base_cancer, d_base_cancer_mort, d_base_mort, age_max,
-         lat_method = c("ProZES", "RadRAT"),
-         metric = c("LAR", "LEAR", "CER",
-                    "REID", "REIC", "ELR", "RADS"))
+get_lear1(l_param, sex = c("f", "m"), risk_model, risk_model_mort,
+          d_base_cancer, d_base_cancer_mort, d_base_mort, age_max,
+          lat_method = c("ProZES", "RadRAT"),
+          metric = c("LAR", "LEAR", "CER",
+                     "REID", "REIC", "ELR", "RADS"))
 }
 \arguments{
   \item{l_param}{A list of parameters that are associated with uncertainty, including components \code{exposure}, \code{ddref}, \code{param_err}, \code{param_ear}, \code{param_err_mort}, \code{param_ear_mort}, \code{wt_transfer}, \code{lat_t0}, \code{lat_eta}. Component \code{exposure} needs to be a list with two vectors of the same length: \code{agex} for the age at each exposure event and \code{dose} for the corresponding dose at each exposure event, given in Gy or Sv. Components \code{param_err} and \code{param_ear} each are a parameter vector for the ERR / EAR risk models defined in \code{risk_model}. Likewise, components \code{param_err_mort} and \code{param_ear_mort} each are a parameter vector for the ERR / EAR risk models defined in \code{risk_model_mort}. Component \code{wt_transfer} is a 2-vector giving the ERR / EAR weights used for risk transfer. This vector must have names \code{"ERR"} and \code{"EAR"}, and weights must be within [0, 1] as well as sum to 1. Component \code{ddref} defines the dose- and dose-rate effectiveness factor (DDREF) with a default of 1. Components \code{lat_t0} and \code{lat_eta} are used for the S-shaped latency function with \code{t0} being the central value and \code{lat_eta} defining the width of the transition period from 0 to full risk if argument \code{lat_method} is set to \code{"ProZES"}.}

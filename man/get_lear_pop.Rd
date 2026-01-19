@@ -20,8 +20,11 @@ get_lear_pop(x, n_sim = 1000L, exposure, wt_transfer,
   \item{n_sim}{Numer of simulated parameter settings for Monte Carlo approach to estimate uncertainty interval. See \code{\link{get_lear1_mc}}.}
   \item{exposure}{A list defining the exposure events with one component for each such event. Each component defining a single exposure event is a list with components \code{timing} for the years of exposure following the age given in \code{x}, \code{distr} for the dose distribution class, and \code{param} with the parameters necessary to specify the dose distribution. See \code{\link{gen_exposure}} - a utility function that may be used to create such a list.}
   \item{wt_transfer}{A 2-vector giving the ERR / EAR weights used for risk transfer. This vector must have names \code{"ERR"} and \code{"EAR"}, and weights should be within [0, 1] as well as sum to 1. Otherwise, values will be re-scaled.}
+  \item{lat_t0}{The central value For the S-shaped latency function.}
+  \item{lat_eta}{The width of the transition period from 0 to full risk for the S-shaped latency function. Used for argument \code{lat_method="ProZES"}.}
+  \item{lat_fixed}{Set latency parameters \code{lat_t0} and \code{lat_eta} to a fixed value without uncertainty?}
   \item{wt_transfer_fixed}{Set \code{wt_transfer} weights to a fixed value without uncertainty?}
-  \item{ddref_transfer_fixed}{Set \code{ddref} Dose- and Dose-Rate Effectiveness Factor to a fixed value without uncertainty?}
+  \item{ddref_fixed}{Set \code{ddref} Dose- and Dose-Rate Effectiveness Factor to a fixed value without uncertainty?}
   \item{metric}{One or several risk metrics. See \code{\link{get_lear1}}.}
   \item{stratify_sex}{Report number of expected cases separately for men and women?}
   \item{pop_ref}{Report number of expected cases per \code{pop_ref} persons.}

@@ -21,8 +21,9 @@ get_lear1_mc(exposure, sex = c("f", "m"), n_sim = 1000L, wt_transfer,
   \item{wt_transfer}{A 2-vector giving the ERR / EAR weights used for risk transfer. This vector must have names \code{"ERR"} and \code{"EAR"}, and weights should be within [0, 1] as well as sum to 1. Otherwise, values will be re-scaled.}
   \item{lat_t0}{The central value For the S-shaped latency function.}
   \item{lat_eta}{The width of the transition period from 0 to full risk for the S-shaped latency function. Used for argument \code{lat_method="ProZES"}.}
+  \item{lat_fixed}{Set latency parameters \code{lat_t0} and \code{lat_eta} to a fixed value without uncertainty?}
   \item{wt_transfer_fixed}{Set \code{wt_transfer} weights to a fixed value without uncertainty?}
-  \item{ddref_transfer_fixed}{Set \code{ddref} Dose- and Dose-Rate Effectiveness Factor to a fixed value without uncertainty?}
+  \item{ddref_fixed}{Set \code{ddref} Dose- and Dose-Rate Effectiveness Factor to a fixed value without uncertainty?}
   \item{metric}{One or several risk metrics. See \code{\link{get_lear1}}.}
   \item{alpha}{Statistical significance level defining the width of the confidence interval as 1 - \code{alpha}.}
   \item{multicore}{Do multicore parallel processing?}

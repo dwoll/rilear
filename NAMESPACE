@@ -1,14 +1,15 @@
 importFrom(stats,
            as.formula, lag, lm, median, predict, quantile, rbeta,
-           reshape, rlnorm, rnorm, runif, setNames, splinefun,
+           rbinom, reshape, rlnorm, rnorm, runif, setNames, splinefun,
            weighted.mean)
 importFrom(utils, head, tail, hasName)
 importFrom(parallel, clusterEvalQ, makeCluster, parLapply, stopCluster)
 importFrom(parallelly, availableCores)
 importFrom(mvtnorm, rmvnorm)
 importFrom(dplyr,
-           arrange, bind_cols, bind_rows, filter, group_by, if_else,
-           left_join, mutate, n, rename, select, summarize, ungroup)
+           arrange, bind_cols, bind_rows, everything, filter, group_by,
+           if_else, left_join, mutate, n, rename, select, summarize,
+           ungroup)
 
 export(gen_exposure,
        get_lear1, get_lear1_mc,
