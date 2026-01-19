@@ -72,7 +72,7 @@ interpol_mort_rate <- function(x,
                                region=c("country", "regional"),
                                method=c("natural", "monoH.FC", "hyman"),
                                age=0:100,
-                               age_join=50,
+                               age_join=40,
                                out=c("L", "W")) {
     region <- match.arg(region)
     out    <- match.arg(out)

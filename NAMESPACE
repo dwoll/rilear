@@ -12,7 +12,7 @@ importFrom(dplyr,
 
 export(gen_exposure,
        get_lear1, get_lear1_mc,
-       get_lear1_pop, get_lear1_pop1, get_lear_pop,
+       get_lear_pop, get_lear1_pop, get_lear1_pop1,
        interpol_cancer_rate,
        interpol_mort_rate,
        rm_solid_incid_sumray,

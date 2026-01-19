@@ -9,14 +9,6 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 
-map_metric <- function(x) {
-  ## map metrics to unique names
-  c(LAR ="LEAR", LEAR="LEAR", CER="LEAR",
-    REID="REID", REIC="REID",
-    ELR ="ELR",
-    RADS="RADS")[toupper(x)] |> unname() |> unique()
-}
-
 get_lear1 <- function(## parameters with uncertainty - in list l_param
                       # exposure = list(dose, agex)    # dose in Gy or Sv
                       # param_err,

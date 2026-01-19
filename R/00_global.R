@@ -8,6 +8,17 @@
 ## general functions
 #####---------------------------------------------------------------------------
 
+## map equivalent metric names to unique names
+map_metric <- function(x) {
+    ## map metrics to unique names
+    c(LAR ="LEAR", LEAR="LEAR", CER="LEAR",
+      REID="REID", REIC="REID",
+      ELR ="ELR",
+      RADS="RADS")[toupper(x)] |>
+        unname() |>
+        unique()
+}
+
 ## custom length function -> nrow() for matrix, data.frame
 get_len <- function(x) {
     if(inherits(x, "matrix") || inherits(x, "data.frame")) {
@@ -23,6 +34,8 @@ inv_l_param <- function(x) {
     comp_names <- names(x)
     comp_lens  <- vapply(x, get_len, FUN.VALUE=numeric(1))
     comp_len   <- unique(comp_lens)
+    
+    ## lengths of components must be identical
     stopifnot(length(comp_len) == 1L)
     
     swap <- function(i) {
@@ -38,6 +51,7 @@ inv_l_param <- function(x) {
         l_i <- setNames(l_i0, comp_names)
         ## component dose is a named vector but needs to be a list
         ## with two components - agex and dose
+        ## column names of dose matrix = age at exposure
         l_i[["exposure"]] <- list(agex_timing=as.numeric(names(l_i[["exposure"]])),
                                   dose=unname(l_i[["exposure"]]))
         
@@ -73,6 +87,8 @@ f_latency <- function(tse, t0, eta, method=c("ProZES", "RadRAT")) {
 
 #####---------------------------------------------------------------------------
 ## age functions - convert age-band groups to numeric representation
+## TODO
+## population-weighted mean of highest age category
 #####---------------------------------------------------------------------------
 
 ## given integer age groups in the form of integers "0", "1", ..., "99", "100+",

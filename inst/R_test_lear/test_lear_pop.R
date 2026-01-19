@@ -66,7 +66,7 @@ d_pop_frankfurt <- d_pop_ger_district_2024L |>
 ## with cancer mortality
 library(rilear)
 get_lear_pop(x       =d_pop_frankfurt,
-             n_sim   =10000L,
+             n_sim   =100L,
              exposure=gen_exposure(n     =1,
                                    timing=1,
                                    ddref =1,
@@ -86,7 +86,7 @@ get_lear_pop(x       =d_pop_frankfurt,
              stratify_sex      =TRUE,
              pop_ref           =100000,
              alpha             =0.05,
-             multicore         =TRUE,
+             multicore         =FALSE,
              n_cores_max       =10L,
              n_cores_omit      =2L,
              d_base_cancer     =d_cancer_ger_incid_solidW_i,

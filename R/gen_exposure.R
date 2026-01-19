@@ -6,13 +6,13 @@
 #####---------------------------------------------------------------------------
 
 gen_exposure <- function(n,
-                         agex,
-                         timing,
+                         agex,    # for exposed individuals: age at exposure
+                         timing,  # for exposed population: interval of exposure events
                          dose_distr=c("fixed",         # param = c(value)
                                       "normal",        # param = c(mean, sd)
                                       "lognormal",     # param = c(gmean, gsd)
                                       "triangular",    # param = c(mode, min, max)
-                                      "logtriangular", # param = c(mode, min, max)
+                                      "logtriangular",
                                       "uniform",       # param = c(min, max)
                                       "loguniform"),
                          dose_param,

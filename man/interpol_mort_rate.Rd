@@ -9,7 +9,7 @@ interpol_mort_rate(x,
                    region = c("country", "regional"),
                    method = c("natural", "monoH.FC", "hyman"),
                    age = 0:100,
-                   age_join = 50,
+                   age_join = 40,
                    out = c("L", "W"))
 }
 \arguments{

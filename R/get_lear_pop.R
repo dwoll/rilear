@@ -57,10 +57,10 @@ get_lear1_pop1 <- function(x,
 ## for one complete population
 #####---------------------------------------------------------------------------
 
-get_lear1_pop <- function(x, d_pop, ...) {
+get_lear1_pop <- function(l_param, d_pop, ...) {
     ## split population into separate rows and get result for each one
     l_pop_spl <- split(d_pop, seq_len(nrow(d_pop)))
-    l_out     <- lapply(l_pop_spl, get_lear1_pop1, l_param=x, ...)
+    l_out     <- lapply(l_pop_spl, get_lear1_pop1, l_param=l_param, ...)
     bind_rows(l_out)
 }
 
@@ -256,7 +256,8 @@ get_lear_pop <- function(x,        # population
                    mean_abs  =round(mean_abs),
                    median_abs=round(median_abs),
                    PIlo_abs  =round(PIlo_abs),
-                   PIup_abs  =round(PIup_abs))
+                   PIup_abs  =round(PIup_abs)) |>
+            dplyr::select(metric, pop, pop_ref, everything())
     }
     
     d_lear_out
