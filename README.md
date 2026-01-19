@@ -4,7 +4,7 @@
 
 ## Background
 
-R package for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events and simultaneous application to a whole population to project total number of expected cancer cases.
+R package for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external low-LET exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events and simultaneous application to a whole population to project total number of expected cancer cases.
 
 ## Goals
 
