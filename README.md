@@ -74,5 +74,6 @@ Interpolated for individual years of age.
   - ProZES: Ulanowski et al. Radiat Environ Biophys 2020. DOI: 10.1007/s00411-020-00866-7
   - RadRAT: Berrington de Gonzalez et al. JRP 2012. DOI: 10.1088/0952-4746/32/3/205
   - Sasaki et al. J Radiat Prot Res 2023 DOI: 10.14407/jrpr.2022.00213
+  - [EPA Blue Book](https://www.epa.gov/system/files/documents/2025-03/402-r-99-003_508-d.pdf)
   - Walsh et al. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0
   - LARisk: Lee et al. DOI: 10.32614/CRAN.package.LARisk
