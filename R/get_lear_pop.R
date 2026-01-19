@@ -22,7 +22,7 @@ get_lear1_pop1 <- function(x,
                            # d_base_mort,
                            # lat_method
                            ...
-                           ) {
+                          ) {
     stopifnot(nrow(x) == 1L)
     
     if(x[["age_n"]] > age_max) {

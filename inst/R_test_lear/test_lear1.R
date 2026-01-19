@@ -9,170 +9,44 @@ library(rilear)
 # load("../../data_in/data_in.Rdata")
 
 #####---------------------------------------------------------------------------
-## use convenience function to generate list of exposure events
-## recycling is done to reach n number of exposures
-## years are made consecutive from indicated start
-#####---------------------------------------------------------------------------
-
-expo_event <- gen_exposure(n         =3,
-                           agex      =20,
-                           dose_distr=c("normal", "triangular"),
-                           dose_param=list(c(mean=0.5, sd=0.05),
-                                           c(mode=0.5, min=0.1, max=0.6)),
-                           dose_rate ="acute",
-                           ddref     =1)
-
-#####---------------------------------------------------------------------------
 ## solid incidence, lifetable, Walsh2021 model
 #####---------------------------------------------------------------------------
 
 rm_incid <- rm_solid_incid_walsh2021()
 rm_mort  <- rm_solid_mort_sumray()
 
-get_lear1(l_param=list(exposure      =list(dose=c(0.5, 0.5),
-                                            agex=c(20, 21)),
-                        param_err     =rm_incid$err$param,
-                        param_ear     =rm_incid$ear$param,
-                        param_err_mort=rm_mort$err$param,
-                        param_ear_mort=rm_mort$ear$param,
-                        wt_transfer   =c(ERR=0.5, EAR=0.5),
-                        ddref         =1,
-                        lat_t0        =5,
-                        lat_eta       =6.25),
+rm_incid <- rm_breast_incid_walsh2021()
+rm_incid <- rm_leuk_incid_walsh2021()
+
+get_lear1(l_param=list(exposure      =list(dose =c(0.5),
+                                           agex =c(20),
+                                           ddref=c(1.0)),
+                       param_err     =rm_incid$err$param,
+                       param_ear     =rm_incid$ear$param,
+                       param_err_mort=rm_mort$err$param,
+                       param_ear_mort=rm_mort$ear$param,
+                       wt_transfer   =c(ERR=0.0, EAR=1.0),
+                       lat_t0        =5,
+                       lat_eta       =6.25),
            sex               ="f",
            risk_model        =rm_incid,
-           risk_model_mort   =rm_mort,
-           d_base_cancer     =d_cancer_ger_incid_solidW_i,
-           # d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
-           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+           # risk_model_mort   =rm_mort,
+           # d_base_cancer     =d_cancer_ger_incid_leuk_lymphW_i,
+           # d_base_cancer     =d_cancer_ger_incid_breastW_i,
+           # d_base_cancer     =d_cancer_ger_incid_solidW_i,
+           d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
+           # d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
            d_base_mort       =d_lifetable_ger_2024W,
            # d_base_mort       =d_mort_rate_ger_country_2024W_i,
            age_max           =90,
            lat_method        ="ProZES",
-           metric            =c("LEAR", "REID", "ELR", "RADS"))
+           # metric            =c("LEAR", "REID", "ELR", "RADS")
+           metric            =c("LEAR")
+           )
 
-#####---------------------------------------------------------------------------
-## solid incidence, mortality rate, Walsh2021 model
-#####---------------------------------------------------------------------------
-
-rm_incid <- rm_solid_incid_walsh2021()
-rm_mort  <- rm_solid_mort_sumray()
-
-get_lear1(l_param=list(exposure      =list(dose=0.5, agex=20),
-                        param_err     =rm_incid$err$param,
-                        param_ear     =rm_incid$ear$param,
-                        param_err_mort=rm_mort$err$param,
-                        param_ear_mort=rm_mort$ear$param,
-                        wt_transfer   =c(ERR=0.5, EAR=0.5),
-                        ddref         =1,
-                        lat_t0        =5,
-                        lat_eta       =6.25),
-           sex               ="f",
-           risk_model        =rm_incid,
-           risk_model_mort   =rm_mort,
-           d_base_cancer     =d_cancer_ger_incid_solidW_i,
-           # d_base_cancer   =d_cancer_ger_incid_solid_c44W_i,
-           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-           d_base_mort       =d_mort_rate_ger_country_2024W_i,
-           age_max           =90,
-           lat_method        ="ProZES",
-           metric            ="LEAR")
-
-#####---------------------------------------------------------------------------
-## solid incidence, lifetable, SUMRAY model
-#####---------------------------------------------------------------------------
-
-rm_incid <- rm_solid_incid_sumray()
-rm_mort  <- rm_solid_mort_sumray()
-
-get_lear1(l_param=list(exposure      =list(dose=0.5, agex=20),
-                        param_err     =rm_incid$err$param,
-                        param_ear     =rm_incid$ear$param,
-                        param_err_mort=rm_mort$err$param,
-                        param_ear_mort=rm_mort$ear$param,
-                        wt_transfer   =c(ERR=0.5, EAR=0.5),
-                        ddref         =1,
-                        lat_t0        =5,
-                        lat_eta       =6.25),
-           sex               ="f",
-           risk_model        =rm_incid,
-           risk_model_mort   =rm_mort,
-           d_base_cancer     =d_cancer_ger_incid_solidW_i,
-           # d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
-           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-           d_base_mort       =d_lifetable_ger_2024W,
-           age_max           =90,
-           lat_method        ="ProZES",
-           metric            ="LEAR")
-
-#####---------------------------------------------------------------------------
-## breast incidence, lifetable, Walsh2021 model
-#####---------------------------------------------------------------------------
-
-rm_incid <- rm_breast_incid_walsh2021()
-
-get_lear1(l_param=list(exposure   =list(dose=0.5, agex=20),
-                        param_err  =rm_incid$err$param,
-                        param_ear  =rm_incid$ear$param,
-                        wt_transfer=c(ERR=0, EAR=1),
-                        ddref      =1,
-                        lat_t0     =5,
-                        lat_eta    =6.25),
-           sex          ="f",
-           risk_model   =rm_incid,
-           d_base_cancer=d_cancer_ger_incid_breastW_i,
-           d_base_mort  =d_lifetable_ger_2024W,
-           age_max      =90,
-           lat_method   ="ProZES",
-           metric       ="LEAR")
-
-#####---------------------------------------------------------------------------
-## leukemia incidence, lifetable, Walsh2021 model
-#####---------------------------------------------------------------------------
-
-rm_incid <- rm_leuk_incid_walsh2021()
-
-get_lear1(l_param=list(exposure   =list(dose=0.5, agex=20),
-                        param_err  =rm_incid$err$param,
-                        param_ear  =rm_incid$ear$param,
-                        wt_transfer=c(ERR=0.5, EAR=0.5),
-                        ddref      =1,
-                        lat_t0     =1.5,
-                        lat_eta    =7.66),
-           sex          ="f",
-           risk_model   =rm_incid,
-           d_base_cancer=d_cancer_ger_incid_leuk_lymphW_i,
-           d_base_mort  =d_lifetable_ger_2024W,
-           age_max      =90,
-           lat_method   ="ProZES",
-           metric       ="LEAR")
-
-#####---------------------------------------------------------------------------
-## solid mortality, lifetable, SUMRAY model
-#####---------------------------------------------------------------------------
-
-rm_incid <- rm_solid_mort_sumray()
-rm_mort  <- rm_solid_mort_sumray()
-
-get_lear1(l_param=list(exposure      =list(dose=0.5,
-                                            agex=20),
-                        param_err     =rm_incid$err$param,
-                        param_ear     =rm_incid$ear$param,
-                        param_err_mort=rm_mort$err$param,
-                        param_ear_mort=rm_mort$ear$param,
-                        wt_transfer   =c(ERR=0.5, EAR=0.5),
-                        ddref         =1,
-                        lat_t0        =5,
-                        lat_eta       =6.25),
-           sex               ="f",
-           risk_model        =rm_incid,
-           risk_model_mort   =rm_mort,
-           d_base_cancer     =d_cancer_ger_mort_solidW_i,
-           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-           d_base_mort       =d_lifetable_ger_2024W,
-           age_max           =90,
-           lat_method        ="ProZES",
-           metric            ="LEAR")
+## breast agex 20, 500 mGy RadRAT 0.0338
+## leukemia agex 20, 500 mGy RadRAT 0.00432
+## all agex 20, 500 mGy RadRAT 0.129
 
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------

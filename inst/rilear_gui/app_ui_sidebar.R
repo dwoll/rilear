@@ -15,11 +15,6 @@ dashboardSidebar(
             icon=icon("file-upload", lib="font-awesome")
         ),
         menuItem(
-            "Exposure",
-            tabName="tab_exposure",
-            icon=icon("file-upload", lib="font-awesome")
-        ),
-        menuItem(
             "Risk measures",
             tabName="tab_lear",
             icon=icon("table", lib="font-awesome")

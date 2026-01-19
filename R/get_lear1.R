@@ -10,7 +10,7 @@
 #####---------------------------------------------------------------------------
 
 get_lear1 <- function(## parameters with uncertainty - in list l_param
-                      # exposure = list(dose, agex)    # dose in Gy or Sv
+                      # exposure = list(dose, agex, ddref)    # dose in Gy or Sv
                       # param_err,
                       # param_ear,
                       # param_err_mort,
@@ -40,14 +40,19 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     
     #####-----------------------------------------------------------------------
     ## extract parameters from list - may be NULL if missing
-    dose           <- l_param[["exposure"]][["dose"]]     # in Gy or Sv
-    agex           <- l_param[["exposure"]][["agex"]]
+    dose  <- l_param[["exposure"]][["dose"]]     # in Gy or Sv
+    agex  <- l_param[["exposure"]][["agex"]]
+    ddref <- if(hasName(l_param[["exposure"]], "ddref")) {
+        l_param[["exposure"]][["ddref"]]
+    } else {
+        rep(1, length(dose))
+    }
+                                 
     param_err      <- l_param[["param_err"]]
     param_ear      <- l_param[["param_ear"]]
     param_err_mort <- l_param[["param_err_mort"]]
     param_ear_mort <- l_param[["param_ear_mort"]]
     wt_transfer    <- l_param[["wt_transfer"]]
-    ddref          <- l_param[["ddref"]]
     lat_t0         <- l_param[["lat_t0"]]
     lat_eta        <- l_param[["lat_eta"]]
     
@@ -58,8 +63,8 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     
     #####-----------------------------------------------------------------------
     ## input validation
-    if(length(agex) != length(dose)) {
-        stop("lengths of agex and dose must be equal")
+    if(length(unique(c(length(agex), length(dose), length(ddref)))) != 1L) {
+        stop("lengths of 'agex', 'dose', 'ddref' must be equal")
     }
   
     if((length(wt_transfer) != 2L) ||

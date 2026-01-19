@@ -35,10 +35,6 @@ shinyApp(
                     source("app_ui_tab_baseline.R", local=TRUE, encoding="UTF8")$value
                 ),
                 tabItem(
-                    tabName="tab_exposure",
-                    source("app_ui_tab_exposure.R", local=TRUE, encoding="UTF8")$value
-                ),
-                tabItem(
                     tabName="tab_lear",
                     source("app_ui_tab_lear.R", local=TRUE, encoding="UTF8")$value
                 ),
