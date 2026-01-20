@@ -28,7 +28,7 @@ expo_event <- gen_exposure(n     =2,
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rilear:::gen_param_mc(n_sim=10,
+p_mc <- rilear:::gen_param_mc(n_sim=10,
                       exposure         =expo_event,
                       wt_transfer      =c(ERR=0.5, EAR=0.5),
                       lat_t0=5,

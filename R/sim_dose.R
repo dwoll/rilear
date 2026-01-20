@@ -48,32 +48,41 @@ dose_distr_have <- c("fixed",         # param = c(value)
                      "uniform",       # param = c(min, max)
                      "loguniform")    # param = c(min, max)
 
-sim_dose <- function(x, n_sim, ddref_fixed=FALSE) {
-    if(!hasName(x, "dose_distr")) {
-        stop("x must have component 'dose_distr' for the dose distribution")
+sim_dose <- function(x,
+                     n_sim,
+                     ddref_fixed=FALSE,
+                     transpose=FALSE) {
+    dose_distr <- if(!hasName(x, "dose_distr")) {
+        "fixed"
+    } else {
+        x[["dose_distr"]]
     }
     
     if(!hasName(x, "dose_param")) {
         stop("x must have component 'dose_param' for distribution parameters")
+    } else {
+        dose_param <- x[["dose_param"]]
     }
     
-    if(!hasName(x, "agex") && !hasName(x, "timing")) {
-        stop("x must have component 'agex' or 'timing' for age at exposure")
-    }
-    
-    if(!hasName(x, "dose_rate")) {
-        stop("x must have component 'dose_rate' specifying either 'acute' or 'chronic'")
+    dose_rate <- if(!hasName(x, "dose_rate")) {
+        "acute"
+    } else {
+        x[["dose_rate"]]
     }
 
-    if(!hasName(x, "ddref")) {
-        stop("x must have component 'ddref' specifying the DDREF")
+    ddref <- if(!hasName(x, "ddref")) {
+        1
+    } else {
+        x[["ddref"]]        
     }
     
-    dose_distr  <- x[["dose_distr"]]
-    dose_param  <- x[["dose_param"]]
-    dose_rate   <- x[["dose_rate"]]
-    ddref       <- x[["ddref"]]
-    agex_timing <- if(hasName(x, "agex")) { x[["agex"]] } else { x[["timing"]] }
+    agex_timing_mc <- if(hasName(x, "agex")) {
+        rep(x[["agex"]], n_sim)
+    } else if(hasName(x, "timing")) {
+        rep(x[["timing"]], n_sim)
+    } else {
+        stop("x must have component 'agex' or 'timing' for age at exposure")
+    }
     
     if(!(dose_distr %in% dose_distr_have)) {
         stop(paste("x$dose_distr must be one of", 
@@ -130,10 +139,14 @@ sim_dose <- function(x, n_sim, ddref_fixed=FALSE) {
     ## dose rate
     dose_rate_mc <- rep(dose_rate, n_sim)
     
+    ## set negative dose to 0
     dose_mc[dose_mc < 0] <- 0
-    m_dose_mc <- cbind(dose_mc)
-    colnames(m_dose_mc) <- agex_timing
-    list(dose=m_dose_mc,
-         ddref=ddref_mc,
-         dose_rate=dose_rate_mc)
+    # m_dose_mc <- cbind(dose_mc)
+    # colnames(m_dose_mc) <- agex_timing
+    l_out <- list(agex_timing=agex_timing_mc,
+                  dose       =dose_mc,
+                  ddref      =ddref_mc,
+                  dose_rate  =dose_rate_mc)
+    
+    l_out
 }

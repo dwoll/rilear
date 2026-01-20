@@ -1,14 +1,13 @@
 # TODO
 
-  * Adjust help pages for changed functions
+  * DDREF and dose_rate must be placed inside exposure by gen_param_mc(), sim_dose(), don't use colnames for agex
   * Speed up
   * Automatically calculate risks for several / all available cancer sites / risk models
-  * Simulate DDREF, possibly dependent on dose, dose rate "acute" vs. "chronic"
+  * More detailed uncertainty for parameters following ProZES / RadRAT, in particular DDREF, possibly dependent on dose, dose rate "acute" vs. "chronic"
   * REIC: calc excess cancer mortality for Surv_E even for REIC?
   * Smooth rates instead of interpolate?
   * Validate using ProZES, RadRAT, LARisk
   * Convenience function cancer="all_solid", outcome="incidence", region="Germany", exposure="acute"
-  * More detailed uncertainty for parameters following ProZES / RadRAT
   * Leukemia / lymphoma mortality model
   * Breast cancer mortality model
   * Leukemia / lymphoma: C91-C95, No CLL, ATL -> CLL (C91.1, C91.4) / ATL (C91.5) not in in baseline -> What now?

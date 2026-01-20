@@ -54,10 +54,11 @@ gen_param_mc <- function(n_sim            =1000L,
     
     #####-----------------------------------------------------------------------
     ## dose - bind to matrix
-    l_expo_mc    <- lapply(exposure, sim_dose, n_sim=n_sim)
-    dose_mc      <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose"]] }))
-    ddref_mc     <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["ddref"]] }))
-    dose_rate_mc <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose_rate"]] }))
+    l_expo_mc0    <- lapply(exposure, sim_dose, n_sim=n_sim, transpose=FALSE)
+    l_expo_mc     <- inv_l_dose(l_expo_mc0)
+    #dose_mc      <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose"]] }))
+    #ddref_mc     <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["ddref"]] }))
+    #dose_rate_mc <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose_rate"]] }))
     
     #####-----------------------------------------------------------------------
     ## weights for ERR-EAR transfer of risk
@@ -133,9 +134,10 @@ gen_param_mc <- function(n_sim            =1000L,
     
     #####-----------------------------------------------------------------------
     ## join simulated parameters into list
-    l_param0 <- list(exposure      =dose_mc,
-                     ddref         =ddref_mc,
-                     dose_rate     =dose_rate_mc,
+    l_param0 <- list(exposure      =l_expo_mc,
+                     #exposure      =dose_mc,
+                     #ddref         =ddref_mc,
+                     #dose_rate     =dose_rate_mc,
                      param_err     =beta_err_mc,
                      param_ear     =beta_ear_mc,
                      param_err_mort=beta_err_mort_mc,
@@ -148,6 +150,6 @@ gen_param_mc <- function(n_sim            =1000L,
     ## turn list inside-out such that each component
     ## is one parameter set for excess lifetime risk calculation
     l_param1 <- Filter(Negate(is.null), l_param0)
-    l_param  <- c(inv_l_param(l_param1))
+    l_param  <- inv_l_param(l_param1)
     l_param
 }

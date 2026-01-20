@@ -39,7 +39,8 @@ inv_l_param <- function(x) {
     stopifnot(length(comp_len) == 1L)
     
     swap <- function(i) {
-        l_i0 <- lapply(seq_along(x), function(j) {
+        ## component exposure is already in correct shape
+        l_i0 <- lapply(seq_along(x)[-1], function(j) {
             if(inherits(x[[j]], "matrix") ||
                inherits(x[[j]], "data.frame")) {
                 x[[j]][i, , drop=TRUE]
@@ -48,17 +49,37 @@ inv_l_param <- function(x) {
             }
         })
         
-        l_i <- setNames(l_i0, comp_names)
-        ## component dose is a named vector but needs to be a list
-        ## with two components - agex and dose
-        ## column names of dose matrix = age at exposure
-        l_i[["exposure"]] <- list(agex_timing=as.numeric(names(l_i[["exposure"]])),
-                                  dose=unname(l_i[["exposure"]]))
-        
-        l_i
+        ## add exposure as first component
+        setNames(c(list(x[[1]][[i]]), l_i0), comp_names)
     }
     
     lapply(seq_len(comp_len), swap)
+}
+
+## turn 3-level dose list inside out
+inv_l_dose <- function(x) {
+    n_event   <- length(x)
+    n_vars    <- lengths(x)
+    var_names <- names(x[[1]])
+    n_var     <- unique(n_vars)
+    stopifnot(length(unique(n_var)) == 1L)
+  
+    n_sims <- vapply(x, function(x_i) {
+      lengths(x_i)
+    }, integer(length(x[[1]])))
+  
+    n_sim <- unique(c(n_sims))
+    stopifnot(length(n_sim) == 1L)
+  
+    l_out <- lapply(seq_len(n_sim), function(k) {
+        l_k0 <- lapply(seq_len(n_var), function(j) {
+            sapply(seq_len(n_event), function(i) {
+                x[[i]][[j]][[k]]
+            })
+        })
+    
+        setNames(l_k0, var_names)
+    })
 }
 
 #####---------------------------------------------------------------------------

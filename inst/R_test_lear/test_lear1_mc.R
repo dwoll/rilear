@@ -14,12 +14,24 @@ library(rilear)
 ## years are made consecutive from indicated start
 #####---------------------------------------------------------------------------
 
-expo_event <- gen_exposure(n         =1,
-                           agex      =20,
+expo_event <- gen_exposure(n         =2,
+                           agex      =c(20, 21),
                            dose_distr=c("normal"),
-                           dose_param=c(mean=0.1, sd=0.015),
+                           dose_param=c(mean=0.5, sd=0.015),
                            dose_rate ="acute",
-                           ddref     =1)
+                           ddref     =c(1, 1.5))
+
+rilear:::sim_dose(x=list(agex=20, dose_param=0.5, ddref=1.5, dose_rate="acute"),
+                  n_sim=10L,
+                  ddref_fixed=FALSE,
+                  transpose=TRUE)
+
+rilear:::sim_dose(x=list(agex=20, dose_param=0.5),
+                  n_sim=10L,
+                  ddref_fixed=FALSE,
+                  transpose=FALSE)
+
+l_expo <- lapply(expo_event, rilear:::sim_dose, n_sim=5)
 
 #####---------------------------------------------------------------------------
 ## solid incidence, lifetable, Walsh2021 model

@@ -1,6 +1,6 @@
 Package: rilear
 Type: Package
-Title: Excess Lifetime Risk Measures for Radiation Exposure
+Title: Radiation Induced Lifetime Excess Absolute Risk
 Version: 0.1
 Date: 2026-01-12
 Authors@R: c(person("Daniel", "Wollschlaeger", role = c("aut", "cre"), email = "wollschlaeger@uni-mainz.de"))

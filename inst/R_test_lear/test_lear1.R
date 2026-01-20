@@ -12,11 +12,10 @@ library(rilear)
 ## solid incidence, lifetable, Walsh2021 model
 #####---------------------------------------------------------------------------
 
-rm_incid <- rm_solid_incid_walsh2021()
-rm_mort  <- rm_solid_mort_sumray()
-
 rm_incid <- rm_breast_incid_walsh2021()
 rm_incid <- rm_leuk_incid_walsh2021()
+rm_incid <- rm_solid_incid_walsh2021()
+rm_mort  <- rm_solid_mort_sumray()
 
 get_lear1(l_param=list(exposure      =list(dose =c(0.5),
                                            agex =c(20),
@@ -25,7 +24,7 @@ get_lear1(l_param=list(exposure      =list(dose =c(0.5),
                        param_ear     =rm_incid$ear$param,
                        param_err_mort=rm_mort$err$param,
                        param_ear_mort=rm_mort$ear$param,
-                       wt_transfer   =c(ERR=0.0, EAR=1.0),
+                       wt_transfer   =c(ERR=0.5, EAR=0.5),
                        lat_t0        =5,
                        lat_eta       =6.25),
            sex               ="f",
@@ -33,8 +32,8 @@ get_lear1(l_param=list(exposure      =list(dose =c(0.5),
            # risk_model_mort   =rm_mort,
            # d_base_cancer     =d_cancer_ger_incid_leuk_lymphW_i,
            # d_base_cancer     =d_cancer_ger_incid_breastW_i,
-           # d_base_cancer     =d_cancer_ger_incid_solidW_i,
-           d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
+           d_base_cancer     =d_cancer_ger_incid_solidW_i,
+           # d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
            # d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
            d_base_mort       =d_lifetable_ger_2024W,
            # d_base_mort       =d_mort_rate_ger_country_2024W_i,

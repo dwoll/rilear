@@ -10,7 +10,7 @@
 #####---------------------------------------------------------------------------
 
 get_lear1 <- function(## parameters with uncertainty - in list l_param
-                      # exposure = list(dose, agex, ddref)    # dose in Gy or Sv
+                      # exposure = list(dose, agex, ddref, dose_rate)    # dose in Gy or Sv
                       # param_err,
                       # param_ear,
                       # param_err_mort,
