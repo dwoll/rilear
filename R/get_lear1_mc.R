@@ -94,8 +94,8 @@ get_lear1_mc <- function(## parameters without uncertainty
     
     parallel::stopCluster(cl)
     bind_rows(l_lear_batch, .id="id_batch") |>
-        mutate(id_mc=interaction(id_mc_in, id_batch, drop=TRUE, sep="_")) |>
-        dplyr::select(-id_mc_in, id_batch)
+        mutate(id_mc=interaction(.data$id_mc_in, .data$id_batch, drop=TRUE, sep="_")) |>
+        dplyr::select(-any_of(c("id_mc_in", "id_batch")))
   } else {
       l_lear <- lapply(l_param,
                        get_lear1,
@@ -118,10 +118,10 @@ get_lear1_mc <- function(## parameters without uncertainty
   d_learL <- d_learW |>
     as.data.frame() |>
     reshape(direction="long",
-            idvar="id_mc",
-            varying=metric,
-            v.names="value",
-            timevar="metric") |>
+            idvar    ="id_mc",
+            varying  =metric,
+            v.names  ="value",
+            timevar  ="metric") |>
     mutate(metric=factor(metric, levels=seq_along(metric_arg), labels=metric_arg))
   
   rownames(d_learL) <- NULL
@@ -129,11 +129,11 @@ get_lear1_mc <- function(## parameters without uncertainty
     ## aggregate MC results for summarizing distribution
     if(aggr_mc) {
         d_learL |>
-            group_by(metric) |>
-            summarize(mean_rsk  =mean(value),
-                      median_rsk=median(value),
-                      CIlo_rsk  =unname(quantile(value, probs=(alpha/2))),
-                      CIup_rsk  =unname(quantile(value, probs=(1-(alpha/2))))) |>
+            group_by(.data$metric) |>
+            summarize(mean_rsk  =mean(.data$value),
+                      median_rsk=median(.data$value),
+                      CIlo_rsk  =unname(quantile(.data$value, probs=(alpha/2))),
+                      CIup_rsk  =unname(quantile(.data$value, probs=(1-(alpha/2))))) |>
             ungroup()
     } else {
         d_learL

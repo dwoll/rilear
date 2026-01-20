@@ -7,7 +7,7 @@ Authors@R: c(person("Daniel", "Wollschlaeger", role = c("aut", "cre"), email = "
 License: GPL (>= 2)
 URL: https://github.com/dwoll/rilear/
 Depends: R (>= 4.1)
-Imports: mvtnorm, dplyr, parallelly, parallel
+Imports: mvtnorm, dplyr, rlang, parallelly, parallel
 Suggests: knitr
 VignetteBuilder: knitr
 LazyData: yes

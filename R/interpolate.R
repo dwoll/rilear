@@ -94,10 +94,10 @@ interpol_mort_rate <- function(x,
         
         ## for older age, use Gompertz model -> log hazard linear in time
         d_fit <- d |>
-            mutate(log_rate=log(rate),
-                   log_rate=if_else(is.finite(log_rate), log_rate, NA_real_)) |>
-            dplyr::filter(age_n >= age_join,
-                          age_n < max(age_n))
+            mutate(log_rate=log(.data$rate),
+                   log_rate=if_else(is.finite(.data$log_rate), .data$log_rate, NA_real_)) |>
+            dplyr::filter(.data$age_n >= age_join,
+                          .data$age_n < max(.data$age_n))
         
         fit_g  <- lm(as.formula("log_rate ~ age_n"), data=d_fit)
         rate_g <- exp(predict(fit_g, data.frame(age_n=age)))
