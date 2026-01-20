@@ -53,13 +53,10 @@ gen_param_mc <- function(n_sim            =1000L,
     }
     
     #####-----------------------------------------------------------------------
-    ## dose - bind to matrix
-    l_expo_mc0    <- lapply(exposure, sim_dose, n_sim=n_sim, transpose=FALSE)
-    l_expo_mc     <- inv_l_dose(l_expo_mc0)
-    #dose_mc      <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose"]] }))
-    #ddref_mc     <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["ddref"]] }))
-    #dose_rate_mc <- do.call(cbind,  lapply(l_expo_mc, function(e) { e[["dose_rate"]] }))
-    
+    ## dose - list - 1 component per exposure event
+    l_expo_mc0 <- lapply(exposure, sim_dose, n_sim=n_sim, transpose=FALSE)
+    l_expo_mc  <- inv_l_dose(l_expo_mc0) # 1 component per n_sim
+
     #####-----------------------------------------------------------------------
     ## weights for ERR-EAR transfer of risk
     ## ProZES: uniform in [0, 1], otherwise suggest 0.5 ERR - 0.5 EAR
@@ -135,9 +132,6 @@ gen_param_mc <- function(n_sim            =1000L,
     #####-----------------------------------------------------------------------
     ## join simulated parameters into list
     l_param0 <- list(exposure      =l_expo_mc,
-                     #exposure      =dose_mc,
-                     #ddref         =ddref_mc,
-                     #dose_rate     =dose_rate_mc,
                      param_err     =beta_err_mc,
                      param_ear     =beta_ear_mc,
                      param_err_mort=beta_err_mort_mc,

@@ -1,6 +1,6 @@
 # TODO
 
-  * DDREF and dose_rate must be placed inside exposure by gen_param_mc(), sim_dose(), don't use colnames for agex
+  * Eliminate "no visible binding" NOTEs from using dplyr - use rlang::.data$, select("varname")
   * Speed up
   * Automatically calculate risks for several / all available cancer sites / risk models
   * More detailed uncertainty for parameters following ProZES / RadRAT, in particular DDREF, possibly dependent on dose, dose rate "acute" vs. "chronic"

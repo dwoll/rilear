@@ -38,9 +38,12 @@ inv_l_param <- function(x) {
     ## lengths of components must be identical
     stopifnot(length(comp_len) == 1L)
     
+    ## index of exposure parameters
+    idx_expo <- which(comp_names == "exposure")
+    
     swap <- function(i) {
         ## component exposure is already in correct shape
-        l_i0 <- lapply(seq_along(x)[-1], function(j) {
+        l_i0 <- lapply(seq_along(x)[-idx_expo], function(j) {
             if(inherits(x[[j]], "matrix") ||
                inherits(x[[j]], "data.frame")) {
                 x[[j]][i, , drop=TRUE]
@@ -50,7 +53,8 @@ inv_l_param <- function(x) {
         })
         
         ## add exposure as first component
-        setNames(c(list(x[[1]][[i]]), l_i0), comp_names)
+        c(exposure=list(x[[idx_expo]][[i]]),
+          setNames(l_i0, comp_names[-idx_expo]))
     }
     
     lapply(seq_len(comp_len), swap)

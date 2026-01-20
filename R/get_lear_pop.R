@@ -157,8 +157,9 @@ get_lear_pop <- function(x,        # population
 
         parallel::stopCluster(cl)
         bind_rows(l_lear_batch, .id="id_batch") |>
-            mutate(id_mc=interaction(id_mc_in, id_batch, drop=TRUE, sep="_")) |>
-            dplyr::select(-id_mc_in, id_batch)
+            mutate(id_mc=interaction(.data$id_mc_in, .data$id_batch,
+                                     drop=TRUE, sep="_")) |>
+            dplyr::select(-all_of(c("id_mc_in", "id_batch")))
     } else {
         l_lear <- lapply(l_param,
                          get_lear1_pop,
@@ -181,11 +182,11 @@ get_lear_pop <- function(x,        # population
     ## long format with respect to agex, metric, and MC run
     ## prediction intervals / a-posteriori distribution: simulate events
     d_lear <- d_lear0 |>
-        mutate(cases=rbinom(n=n(), size=pop, prob=value))
+        mutate(cases=rbinom(n=n(), size=.data$pop, prob=.data$value))
     
     d_pop_sex <- x |>
-        group_by(sex) |>
-        summarize(pop_sex=sum(pop)) |>
+        group_by(.data$sex) |>
+        summarize(pop_sex=sum(.data$pop)) |>
         ungroup()
     
     pop_total <- sum(x[["pop"]])
@@ -195,69 +196,69 @@ get_lear_pop <- function(x,        # population
         d_lear |>
             ## population weighting separately for sex
             left_join(d_pop_sex, by="sex") |>
-            mutate(weight =pop / pop_sex,
-                   value_w=weight*value) |>
+            mutate(weight =.data$pop / .data$pop_sex,
+                   value_w=.data$weight * .data$value) |>
             ## summarize per MC run - aggregate over age
-            group_by(metric, sex, id_mc) |>
-            summarize(lear_rsk=sum(value_w, na.rm=TRUE),
-                      cases   =sum(cases, na.rm=TRUE)) |>
+            group_by(.data$metric, .data$sex, .data$id_mc) |>
+            summarize(lear_rsk=sum(.data$value_w, na.rm=TRUE),
+                      cases   =sum(.data$cases, na.rm=TRUE)) |>
             ungroup() |>
             ## distribution over MC runs
-            group_by(metric, sex) |>
-            summarize(mean_rsk  =mean(lear_rsk),
-                      median_rsk=median(lear_rsk),
-                      CIlo_rsk  =unname(quantile(lear_rsk, probs=(alpha/2))),
-                      CIup_rsk  =unname(quantile(lear_rsk, probs=(1-(alpha/2)))),
-                      mean_abs  =mean(cases),
-                      median_abs=median(cases),
-                      PIlo_abs  =unname(quantile(cases,   probs=(alpha/2))),
-                      PIup_abs  =unname(quantile(cases,   probs=(1-(alpha/2))))) |>
+            group_by(.data$metric, .data$sex) |>
+            summarize(mean_rsk  =mean(.data$lear_rsk),
+                      median_rsk=median(.data$lear_rsk),
+                      CIlo_rsk  =unname(quantile(.data$lear_rsk, probs=(alpha/2))),
+                      CIup_rsk  =unname(quantile(.data$lear_rsk, probs=(1-(alpha/2)))),
+                      mean_abs  =mean(.data$cases),
+                      median_abs=median(.data$cases),
+                      PIlo_abs  =unname(quantile(.data$cases,   probs=(alpha/2))),
+                      PIup_abs  =unname(quantile(.data$cases,   probs=(1-(alpha/2))))) |>
             ungroup() |>
             left_join(d_pop_sex, by="sex") |>
             mutate(pop_ref=pop_ref,
                    ## per pop_ref
-                   mean_ref  =round((pop_ref/pop_sex)*mean_abs),
-                   median_ref=round((pop_ref/pop_sex)*median_abs),
-                   PIlo_ref  =round((pop_ref/pop_sex)*PIlo_abs),
-                   PIup_ref  =round((pop_ref/pop_sex)*PIup_abs),
-                   mean_abs  =round(mean_abs),
-                   median_abs=round(median_abs),
-                   PIlo_abs  =round(PIlo_abs),
-                   PIup_abs  =round(PIup_abs)) |>
+                   mean_ref  =round((pop_ref/.data$pop_sex)*.data$mean_abs),
+                   median_ref=round((pop_ref/.data$pop_sex)*.data$median_abs),
+                   PIlo_ref  =round((pop_ref/.data$pop_sex)*.data$PIlo_abs),
+                   PIup_ref  =round((pop_ref/.data$pop_sex)*.data$PIup_abs),
+                   mean_abs  =round(.data$mean_abs),
+                   median_abs=round(.data$median_abs),
+                   PIlo_abs  =round(.data$PIlo_abs),
+                   PIup_abs  =round(.data$PIup_abs)) |>
             rename(pop=pop_sex)
     } else {
         d_lear |>
             ## population weighting
-            mutate(weight =pop / pop_total,
-                   value_w=weight*value) |>
+            mutate(weight =.data$pop / pop_total,
+                   value_w=.data$weight*.data$value) |>
             ## summarize per MC run - aggregate over age
-            group_by(metric, id_mc) |>
-            summarize(lear_rsk=sum(value_w, na.rm=TRUE),
-                      cases   =sum(cases, na.rm=TRUE)) |>
+            group_by(.data$metric, .data$id_mc) |>
+            summarize(lear_rsk=sum(.data$value_w, na.rm=TRUE),
+                      cases   =sum(.data$cases, na.rm=TRUE)) |>
             ungroup() |>
             ## distribution over MC runs
-            group_by(metric) |>
-            summarize(mean_rsk  =mean(lear_rsk),
-                      median_rsk=median(lear_rsk),
-                      CIlo_rsk  =unname(quantile(lear_rsk, probs=(alpha/2))),
-                      CIup_rsk  =unname(quantile(lear_rsk, probs=(1-(alpha/2)))),
-                      mean_abs  =mean(cases),
-                      median_abs=median(cases),
-                      PIlo_abs  =unname(quantile(cases,   probs=(alpha/2))),
-                      PIup_abs  =unname(quantile(cases,   probs=(1-(alpha/2))))) |>
+            group_by(.data$metric) |>
+            summarize(mean_rsk  =mean(.data$lear_rsk),
+                      median_rsk=median(.data$lear_rsk),
+                      CIlo_rsk  =unname(quantile(.data$lear_rsk, probs=(alpha/2))),
+                      CIup_rsk  =unname(quantile(.data$lear_rsk, probs=(1-(alpha/2)))),
+                      mean_abs  =mean(.data$cases),
+                      median_abs=median(.data$cases),
+                      PIlo_abs  =unname(quantile(.data$cases,   probs=(alpha/2))),
+                      PIup_abs  =unname(quantile(.data$cases,   probs=(1-(alpha/2))))) |>
             ungroup() |>
             mutate(pop       =pop_total,
                    pop_ref   =pop_ref,
                    ## per pop_ref
-                   mean_ref  =round((pop_ref/pop_total)*mean_abs),
-                   median_ref=round((pop_ref/pop_total)*median_abs),
-                   PIlo_ref  =round((pop_ref/pop_total)*PIlo_abs),
-                   PIup_ref  =round((pop_ref/pop_total)*PIup_abs),
-                   mean_abs  =round(mean_abs),
+                   mean_ref  =round((pop_ref/pop_total)*.data$mean_abs),
+                   median_ref=round((pop_ref/pop_total)*.data$median_abs),
+                   PIlo_ref  =round((pop_ref/pop_total)*.data$PIlo_abs),
+                   PIup_ref  =round((pop_ref/pop_total)*.data$PIup_abs),
+                   mean_abs  =round(.data$mean_abs),
                    median_abs=round(median_abs),
                    PIlo_abs  =round(PIlo_abs),
                    PIup_abs  =round(PIup_abs)) |>
-            dplyr::select(metric, pop, pop_ref, everything())
+            dplyr::select("metric", "pop", "pop_ref", everything())
     }
     
     d_lear_out

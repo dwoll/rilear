@@ -52,7 +52,7 @@ get_lear1_mc(exposure          =expo_event,
              risk_model_mort   =rm_solid_mort_sumray(),
              ##
              alpha             =0.05,
-             multicore         =FALSE,
+             multicore         =TRUE,
              n_cores_max       =10L,
              n_cores_omit      =2L,
              aggr_mc           =TRUE,
