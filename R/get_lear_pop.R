@@ -114,6 +114,7 @@ get_lear_pop <- function(x,        # population
     risk_model      <- dots[["risk_model"]]
     risk_model_mort <- dots[["risk_model_mort"]] # may be NULL
     
+    ## random MC samples before doing parallel processing
     l_param <- gen_param_mc(n_sim            =n_sim,
                             exposure         =exposure,
                             wt_transfer      =wt_transfer,

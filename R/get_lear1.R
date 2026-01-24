@@ -10,7 +10,7 @@
 #####---------------------------------------------------------------------------
 
 get_lear1 <- function(## parameters with uncertainty - in list l_param
-                      # exposure = list(dose, agex, ddref, dose_rate)    # dose in Gy or Sv
+                      # exposure = list(dose, agex, ddref)    # dose in Gy or Sv
                       # param_err,
                       # param_ear,
                       # param_err_mort,
@@ -22,8 +22,12 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
                       l_param,
                       ## parameters without uncertainty
                       sex=c("f", "m"),
+                      ## list with one component per cancer site
+                      ## each component list with two components: outcome, mortality
                       risk_model,
                       risk_model_mort,
+                      ## list with one component per cancer site
+                      ## each component list with two components: outcome, mortality
                       d_base_cancer,
                       d_base_cancer_mort,
                       d_base_mort,
@@ -47,7 +51,13 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     } else {
         rep(1, length(dose))
     }
-                                 
+    
+    ## TODO
+    ## extract cancer sites from l_param[["exposure]]
+    
+    ## TODO
+    ## structure to reflect multiple cancer sites, each with
+    ## own risk models, 1 for outcome, 1 for mortality
     param_err      <- l_param[["param_err"]]
     param_ear      <- l_param[["param_ear"]]
     param_err_mort <- l_param[["param_err_mort"]]
@@ -68,18 +78,22 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     }
   
     if((length(wt_transfer) != 2L) ||
-       any(wt_transfer < 0) ||
+       any(wt_transfer < 0)        ||
        (sum(names(wt_transfer) == c("ERR", "EAR")) != 2L)) {
         stop("invalid weights (wt_transfer) for ERR - EAR transfer")
     }
   
-    wt_transfer <- wt_transfer / sum(wt_transfer)  # normalize to sum to 1
+    ## normalize to sum to 1
+    wt_transfer <- wt_transfer / sum(wt_transfer)
 
     if(age_max <= max(agex)) {
         idx  <- agex >= age_max
         agex <- agex[!idx]
         dose <- dose[!idx]
         warning("some agex >= age_max, removing these agex")
+        ## TODO
+        ## adapt to multiple cancer sites
+        ## one vector per site
         if(length(agex) == 0L) {
             return(setNames(rep(NA_real_, length(metric)), metric))
         }
@@ -118,45 +132,35 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     age_att     <- d_base_cancer[["age_n"]]              # all attained ages
     cancer_base <- d_base_cancer[[paste0("rate_", sex)]]
     
-    ## get ERR for each attained age separately for each age at exposure
-    ## matrix: rows = attained age, cols = agex
-    m_err_a <- vapply(seq_along(agex), function(i) {
+    ## get ERR and EAR for each attained age separately for each age at exposure
+    ## CAVE same param ERR / EAR for both exposure events
+    l_err_ear_a0 <- lapply(seq_along(agex), function(i) {
         err <- f_err(param_err,
                      dose=dose[i],
                      agex=agex[i],
                      age =age_att,
                      sex =sex_n)
-        
-        lat <- f_latency(tse   =age_att - agex[i],
-                         t0    =lat_t0,
-                         eta   =lat_eta,
-                         method=lat_method)
-        
-        (1/ddref[i])*err*lat
-    }, FUN.VALUE=numeric(length(age_att)))
-        
-    ## get EAR for each attained age separately for each age at exposure
-    ## matrix: rows = attained age, cols = agex
-    m_ear_a <- vapply(seq_along(agex), function(i) {
+
         ear <- f_ear(param_ear,
                      dose=dose[i],
                      agex=agex[i],
                      age =age_att,
                      sex =sex_n)
-      
+        
         lat <- f_latency(tse   =age_att - agex[i],
                          t0    =lat_t0,
                          eta   =lat_eta,
                          method=lat_method)
         
-        (1/ddref[i])*ear*lat
-    }, FUN.VALUE=numeric(length(age_att)))
-        
+        list(err=(1/ddref[i])*err*lat,
+             ear=(1/ddref[i])*ear*lat)
+    })
+    
     ## total ERR / EAR per attained age = sum of agex specific ERRs / EARs
-    ## na.rm=TRUE because for later agex (later columns),
-    ## err before exposure is NA
-    err_sum_a <- rowSums(m_err_a, na.rm=TRUE)
-    ear_sum_a <- rowSums(m_ear_a, na.rm=TRUE)
+    ## na.rm=TRUE because for later agex, err / ear before exposure is NA
+    l_err_ear_a <- inv_l_basic(l_err_ear_a0)
+    err_sum_a   <- rowSums(bind_cols(l_err_ear_a[["err"]]), na.rm=TRUE)
+    ear_sum_a   <- rowSums(bind_cols(l_err_ear_a[["ear"]]), na.rm=TRUE)
 
     #####-----------------------------------------------------------------------
     ## survival baseline
@@ -173,44 +177,36 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     
     ## survival exposed
     ## Surv_E = exp(-cumsum(q_E)) = Surv_0 * exp(-cumsum(r_mortality_0*ERR))
-    ## q_E    = q_0 + r_mortality_0 * ERR_mortality
+    ## q_E    = q_0 + (r_mortality_0 * ERR_mortality)
     if(any(metric %in% c("REID", "REIC", "ELR", "RADS"))) {
         ## matrix: rows = attained age, cols = age at exposure
-        m_err_mort_a <- vapply(seq_along(agex), function(i) {
+        l_err_ear_mort_a0 <- lapply(seq_along(agex), function(i) {
             err <- f_err_mort(param_err_mort,
                               dose=dose[i],
                               agex=agex[i],
                               age =age_att,
                               sex =sex_n)
-          
-            lat <- f_latency(tse   =age_att - agex[i],
-                             t0    =lat_t0,
-                             eta   =lat_eta,
-                             method=lat_method)
-          
-            (1/ddref[i])*err*lat
-        }, FUN.VALUE=numeric(length(age_att)))
 
-        ## matrix: rows = attained age, cols = age at exposure
-        m_ear_mort_a <- vapply(seq_along(agex), function(i) {
             ear <- f_ear_mort(param_ear_mort,
                               dose=dose[i],
                               agex=agex[i],
                               age =age_att,
                               sex =sex_n)
-          
+            
             lat <- f_latency(tse   =age_att - agex[i],
                              t0    =lat_t0,
                              eta   =lat_eta,
                              method=lat_method)
           
-            (1/ddref[i])*ear*lat
-        }, FUN.VALUE=numeric(length(age_att)))
-        
+            list(err_mort=(1/ddref[i])*err*lat,
+                 ear_mort=(1/ddref[i])*ear*lat)
+        })
+
         ## total mortality ERR / EAR per attained age
         # = sum of exposure-specific ERRs / EARs
-        err_mort <- rowSums(m_err_mort_a)
-        ear_mort <- rowSums(m_ear_mort_a)
+        l_err_ear_mort_a <- inv_l_basic(l_err_ear_mort_a0)
+        err_mort <- rowSums(bind_cols(l_err_ear_mort_a[["err_mort"]]), na.rm=TRUE)
+        ear_mort <- rowSums(bind_cols(l_err_ear_mort_a[["ear_mort"]]), na.rm=TRUE)
         
         ## excess force of cancer mortality from weighted ERR-EAR risk transfer
         rate_cancer_mort <- d_base_cancer_mort[[paste0("rate_", sex)]]
@@ -219,13 +215,13 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
         
         ## q_excess may be NA due to latency function -> set to 0
         q_excess[!is.finite(q_excess)] <- 0
-        
-        ## Surv_E =        exp(-cumsum(q_exposed))
-        ## Surv_E =        exp(-cumsum(q_base + q_excess))
-        ## Surv_E = Surv_0*exp(-cumsum(q_excess))
         q_exposed <- q_base + q_excess
         
         ## survival exposed at age a -> hazard summed up to a-1
+        ## Surv_E =        exp(-cumsum(q_exposed))
+        ## Surv_E =        exp(-cumsum(q_base + q_excess))
+        ## Surv_E = Surv_0*exp(-cumsum(q_excess))
+        ## same: surv_base*exp(-cumsum(q_excess))
         surv_exposed <- lag(exp(-cumsum(q_exposed)), n=1L, default=1)
     }
     
@@ -234,6 +230,7 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
     idx_keep <- (age_att > min(agex)) & (age_att <= age_max)
     
     ## divide by survival at earliest age at exposure for conditional survival
+    ## - baseline survival because no difference up to exposure
     idx_agex_1st <- which(age_att == min(agex))   # earliest age at exposure
     
     ## functions based on ERR
@@ -242,12 +239,12 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
             (cancer_base*err*surv_base)[idx_keep]    / surv_base[idx_agex_1st]
         },
         REID=function(err) {
-            (cancer_base*err*surv_exposed)[idx_keep] / surv_exposed[idx_agex_1st]
+            (cancer_base*err*surv_exposed)[idx_keep] / surv_base[idx_agex_1st]
         },
         ELR=function(err) {
-            risk_0 <- (cancer_base        *surv_base)[idx_keep]    / surv_base[idx_agex_1st]
-            risk_E <- (cancer_base*(1+err)*surv_exposed)[idx_keep] / surv_exposed[idx_agex_1st]
-            risk_E - risk_0
+            risk_0 <- (cancer_base        *surv_base)[idx_keep]
+            risk_E <- (cancer_base*(1+err)*surv_exposed)[idx_keep]
+            (risk_E - risk_0) / surv_base[idx_agex_1st]
         },
         RADS=function(err) {
             ## CAVE
@@ -262,11 +259,11 @@ get_lear1 <- function(## parameters with uncertainty - in list l_param
             (ear*surv_base)[idx_keep]    / surv_base[idx_agex_1st]
         },
         REID=function(ear) {
-            (ear*surv_exposed)[idx_keep] / surv_exposed[idx_agex_1st]
+            (ear*surv_exposed)[idx_keep] / surv_base[idx_agex_1st]
         },
         ELR=function(ear) {
             ## note: same EAR function es for REID
-            (ear*surv_exposed)[idx_keep] / surv_exposed[idx_agex_1st]
+            (ear*surv_exposed)[idx_keep] / surv_base[idx_agex_1st]
         },
         RADS=function(ear) {
             ## CAVE

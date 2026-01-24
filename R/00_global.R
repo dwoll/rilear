@@ -1,12 +1,39 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
-## internal helper functions
+## internal helper functions and objects
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
+
+## supported dose distributions
+## see: gen_exposure(), sim_dose()
+dose_distr_have <- c("fixed",         # param = c(value)
+                     "normal",        # param = c(mean, sd)
+                     "lognormal",     # param = c(gmean, gsd)
+                     "triangular",    # param = c(mode, min, max)
+                     "logtriangular", # param = c(mode, min, max)
+                     "uniform",       # param = c(min, max)
+                     "loguniform")    # param = c(min, max)
+
+## available cancer sites
+cancer_sites_have <- c("total",
+                       "all_solid",
+                       "breast",
+                       "leuk_lymph")
 
 #####---------------------------------------------------------------------------
 ## general functions
 #####---------------------------------------------------------------------------
+
+## check argument using strict matching, but allowing for multiple values
+check_arg <- function(x, values, multiple=TRUE) {
+    if(multiple) {
+        stopifnot(all(x %in% values))
+    } else {
+        stopifnot((length(x) == 1L) && (x %in% values))
+    }
+  
+    x
+}
 
 ## map equivalent metric names to unique names
 map_metric <- function(x) {
@@ -84,6 +111,27 @@ inv_l_dose <- function(x) {
     
         setNames(l_k0, var_names)
     })
+}
+
+inv_l_basic <- function(x) {
+  comp_lens  <- vapply(x, get_len, FUN.VALUE=numeric(1))
+  comp_len   <- unique(comp_lens)
+  
+  ## lengths of components must be identical
+  stopifnot(length(comp_len) == 1L)
+
+  comp_names <- c(unique(t(vapply(x, names, FUN.VALUE=character(2)))))
+  
+  swap <- function(i) {
+    lapply(seq_along(x), function(j) {
+        x[[j]][[i]]
+    })
+  }
+  
+  l0 <- lapply(seq_len(comp_len), swap)
+  
+  setNames(l0, comp_names)
+  
 }
 
 #####---------------------------------------------------------------------------

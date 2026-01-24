@@ -11,8 +11,7 @@ get_lear1_batch <- function(x, ...) {
     bind_rows(l_out, .id="id_mc_in")
 }
 
-get_lear1_mc <- function(## parameters without uncertainty
-                         exposure,
+get_lear1_mc <- function(exposure,
                          sex              =c("f", "m"),
                          n_sim            =1000L,
                          wt_transfer,
@@ -45,6 +44,7 @@ get_lear1_mc <- function(## parameters without uncertainty
   risk_model      <- dots[["risk_model"]]
   risk_model_mort <- dots[["risk_model_mort"]] # may be NULL
   
+  ## random MC samples before doing parallel processing
   l_param0 <- gen_param_mc(n_sim            =n_sim,
                            exposure         =exposure,
                            wt_transfer      =wt_transfer,

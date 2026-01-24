@@ -8,18 +8,24 @@
 gen_exposure <- function(n,
                          agex,    # for exposed individuals: age at exposure
                          timing,  # for exposed population: interval of exposure events
-                         dose_distr=c("fixed",         # param = c(value)
-                                      "normal",        # param = c(mean, sd)
-                                      "lognormal",     # param = c(gmean, gsd)
-                                      "triangular",    # param = c(mode, min, max)
-                                      "logtriangular",
-                                      "uniform",       # param = c(min, max)
-                                      "loguniform"),
+                         dose_distr ="fixed",
                          dose_param,
-                         dose_rate=c("acute", "chronic"),
-                         ddref=1) {
-    dose_distr <- match.arg(dose_distr, several.ok=TRUE)
-    dose_rate  <- match.arg(dose_rate,  several.ok=TRUE)
+                         dose_rate  ="acute",
+                         ddref      =1,
+                         cancer_site="total") {
+    ## use strict matching
+    dose_distr  <- check_arg(dose_distr,
+                             values=dose_distr_have,
+                             multiple=TRUE)
+    
+    dose_rate   <- check_arg(dose_rate,
+                             values=c("acute", "chronic"),
+                             multiple=TRUE)
+    
+    l_cancer_site <- lapply(cancer_site,
+                            check_arg,
+                            values=cancer_sites_have,
+                            multiple=TRUE)
     
     if(!inherits(dose_param, "list")) {
         dose_param <- rep(list(dose_param), n)
@@ -38,8 +44,14 @@ gen_exposure <- function(n,
     if(length(ddref) < n) {
         ddref <- rep(ddref, n)
     }
+
+    if(length(l_cancer_site) < n) {
+        l_cancer_site <- rep(l_cancer_site, n)
+    }
     
+    ## have agex - for exposure of individual
     if(!missing(agex) && missing(timing)) {
+        ## assume subsequent years of exposure
         if(length(agex) == 1L) {
             agex <- agex + 0:(n-1)
         } else if(length(agex) < n) {
@@ -49,14 +61,17 @@ gen_exposure <- function(n,
         }
         
         lapply(seq_len(n), function(i) {
-            list(agex      =agex[i],
-                 dose_distr=dose_distr[i],
-                 dose_param=dose_param[[i]],
-                 dose_rate =dose_rate[i],
-                 ddref     =ddref[i])
+            list(agex       =agex[i],
+                 dose_distr =dose_distr[i],
+                 dose_param =dose_param[[i]],
+                 dose_rate  =dose_rate[i],
+                 ddref      =ddref[i],
+                 cancer_site=l_cancer_site[i])
         })
+    ## have timing - for exposure of population
     } else if(!missing(timing) && missing(agex)) {
         if(length(timing) == 1L) {
+            ## assume subsequent years of exposure
             timing <- cumsum(c(0, rep(timing, n)))
         } else if(length(timing) < n) {
             timing <- c(vapply(seq_len(n), function(i) {
@@ -65,11 +80,12 @@ gen_exposure <- function(n,
         }
         
         lapply(seq_len(n), function(i) {
-            list(timing    =timing[i],
-                 dose_distr=dose_distr[i],
-                 dose_param=dose_param[[i]],
-                 dose_rate =dose_rate[i],
-                 ddref     =ddref[i])
+            list(timing     =timing[i],
+                 dose_distr =dose_distr[i],
+                 dose_param =dose_param[[i]],
+                 dose_rate  =dose_rate[i],
+                 ddref      =ddref[i],
+                 cancer_site=l_cancer_site[i])
         })
     } else {
         stop("Provide either 'agex' or 'timing'.")

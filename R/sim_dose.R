@@ -38,42 +38,35 @@ dw_rtri <- function(n, t_mode, t_min, t_max) {
 ## possibly dependent on dose, dose_rate "acute" vs. "chronic"
 #####---------------------------------------------------------------------------
 
-## supported dose distributions
-## see: gen_exposure()
-dose_distr_have <- c("fixed",         # param = c(value)
-                     "normal",        # param = c(mean, sd)
-                     "lognormal",     # param = c(gmean, gsd)
-                     "triangular",    # param = c(mode, min, max)
-                     "logtriangular", # param = c(mode, min, max)
-                     "uniform",       # param = c(min, max)
-                     "loguniform")    # param = c(min, max)
-
-sim_dose <- function(x,
-                     n_sim,
-                     ddref_fixed=FALSE,
-                     transpose=FALSE) {
-    dose_distr <- if(!hasName(x, "dose_distr")) {
-        "fixed"
-    } else {
+sim_dose <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
+    dose_distr <- if(hasName(x, "dose_distr")) {
         x[["dose_distr"]]
+    } else {
+        "fixed"
     }
     
-    if(!hasName(x, "dose_param")) {
-        stop("x must have component 'dose_param' for distribution parameters")
-    } else {
+    if(hasName(x, "dose_param")) {
         dose_param <- x[["dose_param"]]
+    } else {
+        stop("x must have component 'dose_param' for distribution parameters")
     }
     
-    dose_rate <- if(!hasName(x, "dose_rate")) {
-        "acute"
-    } else {
+    dose_rate <- if(hasName(x, "dose_rate")) {
         x[["dose_rate"]]
+    } else {
+        "acute"
     }
 
-    ddref <- if(!hasName(x, "ddref")) {
-        1
-    } else {
+    ddref <- if(hasName(x, "ddref")) {
         x[["ddref"]]        
+    } else {
+        1
+    }
+
+    cancer_site <- if(hasName(x, "cancer_site")) {
+        x[["cancer_site"]]        
+    } else {
+        "total"
     }
     
     agex_timing_mc <- if(hasName(x, "agex")) {
@@ -136,8 +129,13 @@ sim_dose <- function(x,
     # }
     
     #####-----------------------------------------------------------------------
-    ## dose rate
-    dose_rate_mc <- rep(dose_rate, n_sim)
+    ## dose rate and cancer site
+    dose_rate_mc   <- rep(dose_rate,   n_sim)
+    cancer_site_mc <- if(inherits(cancer_site, "list")) {
+        rep(cancer_site, n_sim)
+    } else {
+        rep(list(cancer_site), n_sim)
+    }
     
     ## set negative dose to 0
     dose_mc[dose_mc < 0] <- 0
@@ -146,7 +144,8 @@ sim_dose <- function(x,
     l_out <- list(agex_timing=agex_timing_mc,
                   dose       =dose_mc,
                   ddref      =ddref_mc,
-                  dose_rate  =dose_rate_mc)
+                  dose_rate  =dose_rate_mc,
+                  cancer_site=cancer_site_mc)
     
     l_out
 }

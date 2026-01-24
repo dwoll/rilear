@@ -17,9 +17,9 @@ rm_incid <- rm_leuk_incid_walsh2021()
 rm_incid <- rm_solid_incid_walsh2021()
 rm_mort  <- rm_solid_mort_sumray()
 
-get_lear1(l_param=list(exposure      =list(dose =c(0.5),
-                                           agex =c(20),
-                                           ddref=c(1.0)),
+get_lear1(l_param=list(exposure      =list(dose =c(0.5, 1),
+                                           agex =c(20, 21),
+                                           ddref=c(1.0, 1.0)),
                        param_err     =rm_incid$err$param,
                        param_ear     =rm_incid$ear$param,
                        param_err_mort=rm_mort$err$param,
@@ -29,18 +29,18 @@ get_lear1(l_param=list(exposure      =list(dose =c(0.5),
                        lat_eta       =6.25),
            sex               ="f",
            risk_model        =rm_incid,
-           # risk_model_mort   =rm_mort,
+           risk_model_mort   =rm_mort,
            # d_base_cancer     =d_cancer_ger_incid_leuk_lymphW_i,
            # d_base_cancer     =d_cancer_ger_incid_breastW_i,
            d_base_cancer     =d_cancer_ger_incid_solidW_i,
            # d_base_cancer     =d_cancer_ger_incid_solid_c44W_i,
-           # d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+           d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
            d_base_mort       =d_lifetable_ger_2024W,
            # d_base_mort       =d_mort_rate_ger_country_2024W_i,
            age_max           =90,
            lat_method        ="ProZES",
            # metric            =c("LEAR", "REID", "ELR", "RADS")
-           metric            =c("LEAR")
+           metric            =c("LEAR", "ELR")
            )
 
 ## breast agex 20, 500 mGy RadRAT 0.0338

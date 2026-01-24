@@ -24,22 +24,24 @@ expo_event <- gen_exposure(n     =2,
                            dose_rate=c("acute", "chronic"),
                            dose_distr=c("normal", "normal"),
                            dose_param=list(c(mean=0.5, sd=0.05),
-                                           c(mean=0.5, sd=0.05)))
+                                           c(mean=0.25, sd=0.05)))
 
 ## generate sets of parameter settings
 ## with cancer mortality
-p_mc <- rilear:::gen_param_mc(n_sim=10,
+rm      <- list(total=rm_solid_incid_walsh2021())
+rm_mort <- list(total=rm_solid_mort_sumray())
+p_mc <- rilear:::gen_param_mc(n_sim    =10,
                       exposure         =expo_event,
-                      wt_transfer      =c(ERR=0.5, EAR=0.5),
-                      lat_t0=5,
-                      lat_eta=6,
+                      wt_transfer      =list(total=c(ERR=0.5, EAR=0.5)),
+                      lat_t0           =list(total=5),
+                      lat_eta          =list(total=6),
                       lat_method       ="ProZES",
                       lat_fixed        =FALSE,
                       wt_transfer_fixed=FALSE,
                       ddref_fixed      =FALSE,
                       ##
-                      risk_model       =rm_solid_incid_walsh2021(),
-                      risk_model_mort  =rm_solid_mort_sumray())
+                      risk_model       =rm,
+                      risk_model_mort  =rm_mort)
 
 ## without cancer mortality
 rilear:::gen_param_mc(n_sim=10,

@@ -14,14 +14,21 @@ library(rilear)
 ## years are made consecutive from indicated start
 #####---------------------------------------------------------------------------
 
-expo_event <- gen_exposure(n         =2,
-                           agex      =c(20, 21),
-                           dose_distr=c("normal"),
-                           dose_param=c(mean=0.5, sd=0.015),
-                           dose_rate ="acute",
-                           ddref     =c(1, 1.5))
+expo_event <- gen_exposure(n          =2,
+                           agex       =c(20, 21),
+                           dose_distr =c("normal", "fixed"),
+                           dose_param =list(c(mean=0.5, sd=0.015), 0.5),
+                           ddref      =c(1, 1.5),
+                           # dose_rate  ="acute",
+                           cancer_site=list("total",
+                                            c("all_solid", "leuk_lymph"))
+                           )
 
-rilear:::sim_dose(x=list(agex=20, dose_param=0.5, ddref=1.5, dose_rate="acute"),
+rilear:::sim_dose(x=list(agex=20,
+                         dose_param=0.5,
+                         ddref=1.5,
+                         dose_rate="acute",
+                         cancer_site=c("all_solid", "leuk_lymph")),
                   n_sim=10L,
                   ddref_fixed=FALSE,
                   transpose=TRUE)
