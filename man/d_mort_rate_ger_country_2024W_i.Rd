@@ -17,7 +17,7 @@ Overall mortality rates in Germany in 2024, interpolated to yearly attained age,
 Data source: Destatis tables 12411-0013 (population) and 12613-0003 (mortality) \url{https://www-genesis.destatis.de/}
 }
 \seealso{
-\code{\link{get_lear1}},
+\code{\link{get_lear_indiv}},
 \code{\link{get_lear_pop}},
 \code{\link{d_lifetable_ger_2024W}},
 \code{\link{d_mort_rate_ger_district_2017W_i}},

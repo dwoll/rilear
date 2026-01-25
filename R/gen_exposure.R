@@ -6,6 +6,7 @@
 #####---------------------------------------------------------------------------
 
 gen_exposure <- function(n,
+                         sex        =c("f", "m"),
                          agex,    # for exposed individuals: age at exposure
                          timing,  # for exposed population: interval of exposure events
                          dose_distr ="fixed",
@@ -13,7 +14,9 @@ gen_exposure <- function(n,
                          dose_rate  ="acute",
                          ddref      =1,
                          cancer_site="total") {
-    ## use strict matching
+    sex <- match.arg(sex)
+    
+    ## use strict matching for dose_distr, dose_rate, cancer_site
     dose_distr  <- check_arg(dose_distr,
                              values=dose_distr_have,
                              multiple=TRUE)
@@ -61,12 +64,13 @@ gen_exposure <- function(n,
         }
         
         lapply(seq_len(n), function(i) {
-            list(agex       =agex[i],
+            list(sex        =sex,
+                 agex       =agex[i],
                  dose_distr =dose_distr[i],
                  dose_param =dose_param[[i]],
                  dose_rate  =dose_rate[i],
                  ddref      =ddref[i],
-                 cancer_site=l_cancer_site[i])
+                 cancer_site=l_cancer_site[[i]])
         })
     ## have timing - for exposure of population
     } else if(!missing(timing) && missing(agex)) {
@@ -80,12 +84,13 @@ gen_exposure <- function(n,
         }
         
         lapply(seq_len(n), function(i) {
-            list(timing     =timing[i],
+            list(sex        =sex,
+                 timing     =timing[i],
                  dose_distr =dose_distr[i],
                  dose_param =dose_param[[i]],
                  dose_rate  =dose_rate[i],
                  ddref      =ddref[i],
-                 cancer_site=l_cancer_site[i])
+                 cancer_site=l_cancer_site[[i]])
         })
     } else {
         stop("Provide either 'agex' or 'timing'.")

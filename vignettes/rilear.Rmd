@@ -72,25 +72,25 @@ rm_incid <- rm_solid_incid_walsh2021()
 rm_mort  <- rm_solid_mort_sumray()
 
 ## single point estimate after two exposures at age 20, 21
-get_lear1(l_param=list(exposure      =list(dose=c(0.5, 0.7),
-                                           agex=c(20, 21)),
-                       param_err     =rm_incid$err$param,
-                       param_ear     =rm_incid$ear$param,
-                       param_err_mort=rm_mort$err$param,
-                       param_ear_mort=rm_mort$ear$param,
-                       wt_transfer   =c(ERR=0.5, EAR=0.5),
-                       ddref         =1,
-                       lat_t0        =5,
-                       lat_eta       =6.25),
-          sex               ="f",
-          risk_model        =rm_incid,
-          risk_model_mort   =rm_mort,
-          d_base_cancer     =d_cancer_ger_incid_solidW_i,
-          d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-          d_base_mort       =d_lifetable_ger_2024W,
-          age_max           =95,
-          lat_method        ="ProZES",
-          metric            =c("LEAR", "RADS"))
+get_lear_indiv(l_param=list(exposure      =list(dose=c(0.5, 0.7),
+                                                agex=c(20, 21)),
+                            param_err     =rm_incid$err$param,
+                            param_ear     =rm_incid$ear$param,
+                            param_err_mort=rm_mort$err$param,
+                            param_ear_mort=rm_mort$ear$param,
+                            wt_transfer   =c(ERR=0.5, EAR=0.5),
+                            ddref         =1,
+                            lat_t0        =5,
+                            lat_eta       =6.25),
+               sex               ="f",
+               risk_model        =rm_incid,
+               risk_model_mort   =rm_mort,
+               d_base_cancer     =d_cancer_ger_incid_solidW_i,
+               d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
+               d_base_mort       =d_lifetable_ger_2024W,
+               age_max           =95,
+               lat_method        ="ProZES",
+               metric            =c("LEAR", "RADS"))
 ```
 
 ## Whole exposed population

@@ -14,7 +14,7 @@ gen_exposure(n, agex, timing,
 }
 \arguments{
   \item{n}{Number of exposure events.}
-  \item{agex}{Age at exposure for the \code{n} exposure events. Useful for specifying the exposure of a single person in \code{\link{get_lear1}}. Alternative to specifying \code{timing}. Recycling rules are used if fewer than \code{n} entries for \code{agex} are provided.}
+  \item{agex}{Age at exposure for the \code{n} exposure events. Useful for specifying the exposure of a single person in \code{\link{get_lear_indiv}}. Alternative to specifying \code{timing}. Recycling rules are used if fewer than \code{n} entries for \code{agex} are provided.}
   \item{timing}{Assuming no fixed age at exposure, specify the timing of the exposure event in years. For example, \code{c(1, 3)} means that the second exposure event occurs \code{3-1 = 2} years after the first one. Alternative to specifying \code{agex}. Useful for specifying the exposure of a whole population in \code{\link{get_lear_pop}}. Recycling rules are used if fewer than \code{n} entries for \code{timing} are provided.}
   \item{dose_distr}{Distribution to use for generating a dose for each exposure event. Supported:  \code{"fixed"},  \code{"normal"},  \code{"lognormal"}, \code{"triangular"},  \code{"logtriangular"}, \code{"uniform"},  \code{"loguniform"}. \code{"fixed"} for a fixed dose value, random sampling of \code{n} values is done for the other options. Recycling rules are used if fewer than \code{n} entries for \code{dose_distr} are provided.}
   \item{dose_param}{Parameter vector to use for generating \code{n} dose values in Gy or Sv. For \code{dose_distr} = \code{"fixed"} the value to use. For \code{dose_distr} = \code{"normal"} a vector giving the mean and sd. For \code{"lognormal"} the geometric mean and geometric sd. For \code{"triangular"} the mode, minimum, and maximum; for \code{"logtriangular"} the log mode, log minimum and log maximum. For \code{"uniform"} the minimum and maximum. For \code{"loguniform"} the log minimum and the log maximum. To specify different parameter vectors for different exposure events, create a list of parameter vectors to pass to \code{dose_param}. Recycling rules are used if fewer than \code{n} elements or components for \code{dose_param} are provided.}
@@ -29,7 +29,7 @@ A list with one component for each exposure event. Each such component is a list
 .
 }
 \seealso{
-\code{\link{get_lear1}},
+\code{\link{get_lear_indiv}},
 \code{\link{get_lear_pop}}
 }
 \examples{

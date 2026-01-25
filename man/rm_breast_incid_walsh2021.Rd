@@ -22,7 +22,7 @@ A list with these components:
 Walsh et al. A bespoke health risk assessment methodology for the radiation protection of astronauts. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0. Table 4, 11, 12.
 }
 \seealso{
-\code{\link{get_lear1}},
+\code{\link{get_lear_indiv}},
 \code{\link{get_lear_pop}},
 \code{\link{rm_solid_incid_walsh2021}},
 \code{\link{rm_leuk_incid_walsh2021}},

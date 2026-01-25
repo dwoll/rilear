@@ -17,8 +17,8 @@ get_lear1_pop1 <- function(x,
                            ## only passed throught to get_lear1()
                            # risk_model,
                            # risk_model_mort,
-                           # d_base_cancer,
-                           # d_base_cancer_mort,
+                           # base_cancer,
+                           # base_cancer_mort,
                            # d_base_mort,
                            # lat_method
                            ...
@@ -26,29 +26,31 @@ get_lear1_pop1 <- function(x,
     stopifnot(nrow(x) == 1L)
     
     if(x[["age_n"]] > age_max) {
-        cbind(x,
-              metric=metric,
-              value =rep(NA_real_, length(metric)))
+        d_out <- cbind(x, site=names(l_param[["cancer_site"]]))
+        d_out[metric] <- NA_real_
+        d_out
     } else {
         ## update age at exposure to given row of pop
-        l_param[["exposure"]][["agex"]] <- x[["age_n"]] +
-                                           l_param[["exposure"]][["agex_timing"]]
+        l_param[["exposure"]] <- lapply(l_param[["exposure"]], function(ee) {
+            ee[["agex"]] <- x[["age_n"]] + ee[["agex_timing"]]
+            ee
+        })
 
-        m_elr <- get_lear1(l_param,
-                           sex    =as.character(x[["sex"]]),
-                           age_max=age_max,
-                           metric =metric,
-                           ## only passed throught to get_lear1()
-                           # risk_model        =risk_model,
-                           # risk_model_mort   =risk_model_mort,
-                           # d_base_cancer     =d_base_cancer,
-                           # d_base_cancer_mort=d_base_cancer_mort,
-                           # d_base_mort       =d_base_mort,
-                           # lat_method        =lat_method
-                           ...)
+        m_elr <- get_lear_indiv(l_param,
+                                age_max=age_max,
+                                metric =metric,
+                                ## only passed throught to get_lear1()
+                                # risk_model      =risk_model,
+                                # risk_model_mort =risk_model_mort,
+                                # base_cancer     =base_cancer,
+                                # base_cancer_mort=base_cancer_mort,
+                                # d_base_mort     =d_base_mort,
+                                # lat_method      =lat_method
+                                ...)
         
-        ## data frame in long format with respect to metric
-        bind_cols(x, metric=metric, value=c(m_elr))
+        ## data frame in long format with respect to cancer site
+        ## wide format with respect to metric
+        bind_cols(x, m_elr)
     }
 }
 
@@ -99,8 +101,8 @@ get_lear_pop <- function(x,        # population
                          ## passed throught to get_lear1()
                          # age_max,
                          # lat_method       =c("ProZES", "RadRAT"),
-                         # d_base_cancer,
-                         # d_base_cancer_mort,
+                         # base_cancer,
+                         # base_cancer_mort,
                          # d_base_mort,
                          # risk_model,
                          # risk_model_mort,
@@ -129,7 +131,7 @@ get_lear_pop <- function(x,        # population
     
     ## for each set of parameters
     ## get lifetime excess risk estimates for whole population
-    d_lear0 <- if(multicore) {
+    d_learW <- if(multicore) {
         n_cores <- parallelly::availableCores(logical=TRUE,
                                               max=n_cores_max,
                                               omit=n_cores_omit)
@@ -137,7 +139,7 @@ get_lear_pop <- function(x,        # population
         ## make n_cores batches of rows from population data set
         cl <- parallel::makeCluster(n_cores)
         l_param_spl <- split(l_param, seq_along(l_param) %% n_cores)
-        parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear1"))
+        parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear_indiv"))
         parallel::clusterEvalQ(cl, library(rilear))
         
         ## collect all MC results here
@@ -147,13 +149,13 @@ get_lear_pop <- function(x,        # population
                                   d_pop             =x,
                                   metric            =metric,
                                   ##
-                                  # age_max           =age_max,
-                                  # lat_method        =lat_method,
-                                  # risk_model        =risk_model,
-                                  # risk_model_mort   =risk_model_mort,
-                                  # d_base_cancer     =d_base_cancer,
-                                  # d_base_cancer_mort=d_base_cancer_mort,
-                                  # d_base_mort       =d_base_mort,
+                                  # age_max         =age_max,
+                                  # lat_method      =lat_method,
+                                  # risk_model      =risk_model,
+                                  # risk_model_mort =risk_model_mort,
+                                  # base_cancer     =base_cancer,
+                                  # base_cancer_mort=base_cancer_mort,
+                                  # d_base_mort     =d_base_mort,
                                   ...)
 
         parallel::stopCluster(cl)
@@ -164,16 +166,16 @@ get_lear_pop <- function(x,        # population
     } else {
         l_lear <- lapply(l_param,
                          get_lear1_pop,
-                         d_pop             =x,
-                         metric            =metric,
+                         d_pop =x,
+                         metric=metric,
                          ##
-                         # age_max           =age_max,
-                         # lat_method        =lat_method
-                         # risk_model        =risk_model,
-                         # risk_model_mort   =risk_model_mort,
-                         # d_base_cancer     =d_base_cancer,
-                         # d_base_cancer_mort=d_base_cancer_mort,
-                         # d_base_mort       =d_base_mort,
+                         # age_max         =age_max,
+                         # lat_method      =lat_method
+                         # risk_model      =risk_model,
+                         # risk_model_mort =risk_model_mort,
+                         # base_cancer     =base_cancer,
+                         # base_cancer_mort=base_cancer_mort,
+                         # d_base_mort     =d_base_mort,
                          ...)
         
         bind_rows(l_lear, .id="id_mc")
@@ -182,8 +184,22 @@ get_lear_pop <- function(x,        # population
     ## combine results into data set for all MC runs
     ## long format with respect to agex, metric, and MC run
     ## prediction intervals / a-posteriori distribution: simulate events
-    d_lear <- d_lear0 |>
+    metric_arg <- metric
+    vars_var <- metric
+    vars_id  <- setdiff(names(d_learW), vars_var)
+    d_learL <- d_learW |>
+        as.data.frame() |>
+        reshape(direction="long",
+                idvar    =vars_id,
+                varying  =vars_var,
+                v.names  ="value",
+                timevar  ="metric") |>
+        mutate(metric=factor(metric,
+                             levels=seq_along(metric_arg),
+                             labels=metric_arg)) |>
         mutate(cases=rbinom(n=n(), size=.data$pop, prob=.data$value))
+    
+    rownames(d_learL) <- NULL
     
     d_pop_sex <- x |>
         group_by(.data$sex) |>
@@ -194,18 +210,18 @@ get_lear_pop <- function(x,        # population
     
     ## aggregate MC results for summarizing distribution over whole population
     d_lear_out <- if(stratify_sex) {
-        d_lear |>
+        d_learL |>
             ## population weighting separately for sex
             left_join(d_pop_sex, by="sex") |>
             mutate(weight =.data$pop / .data$pop_sex,
                    value_w=.data$weight * .data$value) |>
             ## summarize per MC run - aggregate over age
-            group_by(.data$metric, .data$sex, .data$id_mc) |>
+            group_by(.data$site, .data$metric, .data$sex, .data$id_mc) |>
             summarize(lear_rsk=sum(.data$value_w, na.rm=TRUE),
                       cases   =sum(.data$cases, na.rm=TRUE)) |>
             ungroup() |>
             ## distribution over MC runs
-            group_by(.data$metric, .data$sex) |>
+            group_by(.data$site, .data$metric, .data$sex) |>
             summarize(mean_rsk  =mean(.data$lear_rsk),
                       median_rsk=median(.data$lear_rsk),
                       CIlo_rsk  =unname(quantile(.data$lear_rsk, probs=(alpha/2))),
@@ -228,17 +244,17 @@ get_lear_pop <- function(x,        # population
                    PIup_abs  =round(.data$PIup_abs)) |>
             rename(pop=pop_sex)
     } else {
-        d_lear |>
+        d_learL |>
             ## population weighting
             mutate(weight =.data$pop / pop_total,
                    value_w=.data$weight*.data$value) |>
             ## summarize per MC run - aggregate over age
-            group_by(.data$metric, .data$id_mc) |>
+            group_by(.data$site, .data$metric, .data$id_mc) |>
             summarize(lear_rsk=sum(.data$value_w, na.rm=TRUE),
                       cases   =sum(.data$cases, na.rm=TRUE)) |>
             ungroup() |>
             ## distribution over MC runs
-            group_by(.data$metric) |>
+            group_by(.data$site, .data$metric) |>
             summarize(mean_rsk  =mean(.data$lear_rsk),
                       median_rsk=median(.data$lear_rsk),
                       CIlo_rsk  =unname(quantile(.data$lear_rsk, probs=(alpha/2))),

@@ -10,7 +10,7 @@ get_lear1_pop(l_param, d_pop, ...)
 \arguments{
   \item{l_param}{A list of parameters that are associated with uncertainty, including components \code{exposure}, \code{ddref}, \code{param_err}, \code{param_ear}, \code{param_err_mort}, \code{param_ear_mort}, \code{wt_transfer}, \code{lat_t0}, \code{lat_eta}. Component \code{exposure} needs to be a list with two vectors of the same length: \code{agex_timing} for the timing of each exposure event and \code{dose} for the corresponding dose at each exposure event, given in Gy or Sv. Components \code{param_err} and \code{param_ear} each are a parameter vector for the ERR / EAR risk models defined in \code{risk_model}. Likewise, components \code{param_err_mort} and \code{param_ear_mort} each are a parameter vector for the ERR / EAR risk models defined in \code{risk_model_mort}. Component \code{wt_transfer} is a 2-vector giving the ERR / EAR weights used for risk transfer. This vector must have names \code{"ERR"} and \code{"EAR"}, and weights must be within [0, 1] as well as sum to 1. Component \code{ddref} defines the dose- and dose-rate effectiveness factor (DDREF) with a default of 1. Components \code{lat_t0} and \code{lat_eta} are used for the S-shaped latency function with \code{t0} being the central value and \code{lat_eta} defining the width of the transition period from 0 to full risk if argument \code{lat_method} is set to \code{"ProZES"}.}
   \item{d_pop}{A data frame defining the exposed population. Needs variables \code{age_n} with the numeric age, \code{sex} - a factor with levels \code{"f"} and \code{"m"}, and \code{pop} for the population size. For an example, see \code{\link{d_pop_ger_fedstate_2024L}}.}
-  \item{...}{All remaining arguments that get passed on to \code{\link{get_lear1}}: \code{metric}, \code{age_max}, \code{lat_method}, \code{d_base_cancer}, \code{d_base_cancer_mort} (if available), \code{d_base_mort}, \code{risk_model}, \code{risk_model_mort} (if available).}
+  \item{...}{All remaining arguments that get passed on to \code{\link{get_lear_indiv}}: \code{metric}, \code{age_max}, \code{lat_method}, \code{d_base_cancer}, \code{d_base_cancer_mort} (if available), \code{d_base_mort}, \code{risk_model}, \code{risk_model_mort} (if available).}
 }
 \value{
 A data frame with variables
@@ -32,7 +32,7 @@ CAVE: All calculations preliminary, not yet validated!
 }
 \seealso{
 \code{\link{gen_exposure}},
-\code{\link{get_lear1}},
+\code{\link{get_lear_indiv}},
 \code{\link{get_lear_pop}},
 \code{\link{get_lear1_pop1}},
 \code{\link{d_pop_ger_fedstate_2024L}}

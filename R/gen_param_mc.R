@@ -8,8 +8,8 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 
-gen_param_mc <- function(n_sim            =1000L,
-                         exposure,
+gen_param_mc <- function(exposure,
+                         n_sim            =1000L,
                          wt_transfer,
                          lat_t0,
                          lat_eta,
@@ -28,10 +28,10 @@ gen_param_mc <- function(n_sim            =1000L,
     
     #####-----------------------------------------------------------------------
     ## for each exposure event: dose, ddref
-    ## add agex / timing, dose_rate, cancer site list
+    ## add sex, agex / timing, dose_rate, cancer site list
     #####-----------------------------------------------------------------------
     
-    l_expo_mc <- lapply(exposure, sim_dose, n_sim=n_sim, transpose=FALSE)
+    l_expo_mc <- lapply(exposure, sim_exposure, n_sim=n_sim, transpose=FALSE)
     # l_expo_mc  <- inv_l_dose(l_expo_mc0) # 1 component per n_sim
 
     #####-----------------------------------------------------------------------
@@ -44,6 +44,9 @@ gen_param_mc <- function(n_sim            =1000L,
         unique()
 
     l_cancer_site_mc <- lapply(cancer_sites, function(cs) {
+        ## cancer site name
+        cs_mc <- rep(cs, n_sim)
+        
         #####-----------------------------------------------------------------------
         ## risk model parameters
         beta_err_mc <- mvtnorm::rmvnorm(n    =n_sim,
@@ -79,12 +82,13 @@ gen_param_mc <- function(n_sim            =1000L,
         ## lung: 0.3 ERR - 0.7 EAR
         ## brain: 1 ERR - 0 EAR
         ## normalize to sum 1
-        wt_transfer     <- wt_transfer[[cs]] / sum(wt_transfer[[cs]])
+        wt_transfer_cs  <- wt_transfer[[cs]] / sum(wt_transfer[[cs]])
         wt_transfer_err <- if(wt_transfer_fixed) {
-            rep(wt_transfer[["ERR"]], n_sim)
+            rep(wt_transfer_cs[["ERR"]], n_sim)
         } else {
-            norm_var   <- 0.05^2
-            norm_mean  <- wt_transfer[["ERR"]]
+            norm_var <- 0.05^2
+            ## force norm_mean within [0.01, 0.99]
+            norm_mean  <- 0.01 + 0.98*wt_transfer_cs[["ERR"]]
             beta_alpha <-    norm_mean  * ((norm_mean*(1-norm_mean) / norm_var)-1)
             beta_beta  <- (1-norm_mean) * ((norm_mean*(1-norm_mean) / norm_var)-1)
             rbeta(n_sim, shape1=beta_alpha, shape2=beta_beta)
@@ -141,7 +145,8 @@ gen_param_mc <- function(n_sim            =1000L,
             # lat_t0_mc <- runif(n_sim, min=val_t0["min"], max=val_t0["max"])
         }
         
-        l_cs0 <- list(param_err     =beta_err_mc,
+        l_cs0 <- list(cancer_site   =cs_mc,
+                      param_err     =beta_err_mc,
                       param_ear     =beta_ear_mc,
                       param_err_mort=beta_err_mort_mc,
                       param_ear_mort=beta_ear_mort_mc,
@@ -149,9 +154,7 @@ gen_param_mc <- function(n_sim            =1000L,
                       lat_t0        =lat_t0_mc,
                       lat_eta       =lat_eta_mc)
         
-        l_cs1 <- Filter(Negate(is.null), l_cs0)
-        l_cs  <- l_cs1
-        l_cs
+        Filter(Negate(is.null), l_cs0)
     })
     
     #####-----------------------------------------------------------------------

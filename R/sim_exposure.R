@@ -38,7 +38,14 @@ dw_rtri <- function(n, t_mode, t_min, t_max) {
 ## possibly dependent on dose, dose_rate "acute" vs. "chronic"
 #####---------------------------------------------------------------------------
 
-sim_dose <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
+sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
+    if(hasName(x, "sex")) {
+        stopifnot(length(x[["sex"]]) == 1L)
+        sex_mc <- rep(x[["sex"]], n_sim)
+    } else {
+        stop("x must have component 'sex'")
+    }
+    
     dose_distr <- if(hasName(x, "dose_distr")) {
         x[["dose_distr"]]
     } else {
@@ -66,7 +73,7 @@ sim_dose <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
     cancer_site <- if(hasName(x, "cancer_site")) {
         x[["cancer_site"]]        
     } else {
-        "total"
+        "all_solid"
     }
     
     agex_timing_mc <- if(hasName(x, "agex")) {
@@ -141,7 +148,8 @@ sim_dose <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
     dose_mc[dose_mc < 0] <- 0
     # m_dose_mc <- cbind(dose_mc)
     # colnames(m_dose_mc) <- agex_timing
-    l_out <- list(agex_timing=agex_timing_mc,
+    l_out <- list(sex        =sex_mc,
+                  agex_timing=agex_timing_mc,
                   dose       =dose_mc,
                   ddref      =ddref_mc,
                   dose_rate  =dose_rate_mc,

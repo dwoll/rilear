@@ -15,10 +15,10 @@ dose_distr_have <- c("fixed",         # param = c(value)
                      "loguniform")    # param = c(min, max)
 
 ## available cancer sites
-cancer_sites_have <- c("total",
-                       "all_solid",
+cancer_sites_have <- c("all_solid",
                        "breast",
-                       "leuk_lymph")
+                       "leuk_lymph",
+                       "total")
 
 #####---------------------------------------------------------------------------
 ## general functions

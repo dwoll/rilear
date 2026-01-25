@@ -13,7 +13,7 @@ importFrom(dplyr,
 importFrom(rlang, .data)
 
 export(gen_exposure,
-       get_lear1, get_lear1_mc,
+       get_lear_indiv, get_lear_indiv_mc,
        get_lear_pop, get_lear1_pop, get_lear1_pop1,
        interpol_cancer_rate,
        interpol_mort_rate,
