@@ -36,42 +36,56 @@ sum_err_ear_a <- function(cancer_site, err_ear_a) {
 ## get LEAR for 1 person
 ## for all exposure events
 ## for all cancer sites
-## for all attained ages
 get_lear_indiv <- function(## parameters with uncertainty - in list l_param
-    ## exposure:    for each exposure event:
-    ##              sex, agex, dose (Gy or Sv), ddref, dose_rate,
-    ##              cancer_site
-    ## cancer_site: for each cancer site:
-    ##              param_err / ear / err_mort / ear_mort,
-    ##              wt_transfer, lat_t0, lat_eta
-    l_param,
-    ## parameters without uncertainty
-    ## list with one component per cancer site
-    ## TODO
-    ## each component list with two components: outcome, mortality
-    risk_model,
-    risk_model_mort,
-    ## list with one component per cancer site
-    ## TODO
-    ## each component list with two components: outcome, mortality
-    base_cancer,
-    base_cancer_mort,
-    ## settings independent from exposure event, cancer_site
-    ## overall mortality rates
-    d_base_mort,
-    age_max,
-    lat_method=c("ProZES", "RadRAT"),
-    metric=c("LAR", "LEAR", "CER", "REID", "REIC", "ELR", "RADS")) {
+                           ## exposure:    for each exposure event:
+                           ##              sex, agex, dose (Gy or Sv), ddref, dose_rate,
+                           ##              cancer_site
+                           ## cancer_site: for each cancer site:
+                           ##              param_err / ear / err_mort / ear_mort,
+                           ##              wt_transfer, lat_t0, lat_eta
+                           l_param,
+                           ## parameters without uncertainty
+                           ## list with one component per cancer site
+                           risk_model,
+                           risk_model_mort,
+                           ## list with one component per cancer site
+                           base_cancer,
+                           base_cancer_mort,
+                           ## settings independent from exposure event, cancer_site
+                           ## overall mortality rates
+                           d_base_mort,
+                           age_max,
+                           lat_method=c("ProZES", "RadRAT"),
+                           metric=c("LAR", "LEAR", "CER", "REID", "REIC", "ELR", "RADS")) {
     lat_method <- match.arg(lat_method)
     age_attnd  <- d_base_mort[["age_n"]] # attained age
     metric     <- match.arg(metric, several.ok=TRUE)
     
     ## map metrics to unique names
     metric <- map_metric(metric)
+    
+    ## necessary to separately estimate survival of exposed?
     do_surv_exposed <- any(metric %in% c("REID", "ELR"))
+    if(do_surv_exposed) {
+        if(missing(risk_model_mort) ||
+           missing(base_cancer_mort)) {
+            stop("Need cancer mortality risk model and baseline rates")
+        }
+    }
+
+    ## extract sex
+    sex <- vapply(l_param[["exposure"]], function(e) { e[["sex"]] },
+                  FUN.VALUE=character(1)) |>
+        unique()
+    
+    ## extract cancer sites
+    cancer_sites <- vapply(l_param[["cancer_site"]], function(cs) {
+        cs[["cancer_site"]] }, FUN.VALUE=character(1)) |>
+        unique()
     
     #####-----------------------------------------------------------------------
     ## for each exposure event: get ERR / EAR for each cancer site
+    ## for outcome of interest
     l_err_ear_a0 <- lapply(l_param[["exposure"]],
                            get_err_ear1_n,
                            cancer_site=l_param[["cancer_site"]],
@@ -88,11 +102,25 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     l_err_ear <- Map(sum_err_ear_a,
                      l_param[["cancer_site"]],
                      err_ear_a=list(l_err_ear_a))
-    
+
     #####-----------------------------------------------------------------------
-    ## if necessary & possible (REID / REIC, ELR, RADS)
+    ## overall mortality rates baseline
+    ## force of mortality (hazard) from life table ("q")
+    ## or from mortality rate ("rate")
+    q_base <- if(hasName(d_base_mort, paste0("q_", sex))) {
+        d_base_mort[[paste0("q_", sex)]]
+    } else if(hasName(d_base_mort, paste0("rate_", sex))) {
+        d_base_mort[[paste0("rate_", sex)]]
+    }
+
+    ## overall baseline survival at attained age a
+    ## -> hazard summed up to a-1
+    surv_base <- lag(exp(-cumsum(q_base)), n=1L, default=1)
+
+    #####-----------------------------------------------------------------------
+    ## if necessary & possible (REID / REIC, ELR)
     ## for each exposure event: get mortality ERR / EAR for each cancer site
-    if(do_surv_exposed) {
+    surv_exposed <- if(do_surv_exposed) {
         l_err_ear_mort_a0 <- lapply(l_param[["exposure"]],
                                     get_err_ear1_n,
                                     cancer_site=l_param[["cancer_site"]],
@@ -106,33 +134,34 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
         l_err_ear_mort   <- Map(sum_err_ear_a,
                                 l_param[["cancer_site"]],
                                 err_ear_a=list(l_err_ear_mort_a))
+        
+        ## for each cancer site: excess force of mortality
+        l_q_excess0 <- Map(get_qE1,
+                           l_param[["cancer_site"]],
+                           err_ear           =l_err_ear_mort,
+                           d_base_cancer_mort=base_cancer_mort[cancer_sites],
+                           sex               =sex)
+        
+        l_q_excess <- Filter(Negate(is.null), l_q_excess0)
+        
+        ## total excess force of mortality
+        q_excess <- rowSums(do.call(cbind, l_q_excess))
+        q_excess[!is.finite(q_excess)] <- 0
+        q_exposed <- q_base + q_excess
+        
+        ## survival exposed at age a -> hazard summed up to a-1
+        ## Surv_E =        exp(-cumsum(q_exposed))
+        ## Surv_E =        exp(-cumsum(q_base + q_excess))
+        ## Surv_E = Surv_0*exp(-cumsum(q_excess))
+        ## same: surv_base*exp(-cumsum(q_excess))
+        lag(exp(-cumsum(q_exposed)), n=1L, default=1)
+    } else {
+        NULL
     }
-    
-    #####-----------------------------------------------------------------------
-    ## overall mortality rates baseline
-    ## force of mortality (hazard) from life table ("q")
-    ## or from mortality rate ("rate")
-    sex <- vapply(l_param[["exposure"]], function(e) { e[["sex"]] },
-                  FUN.VALUE=character(1)) |>
-        unique()
-    
-    q_base <- if(hasName(d_base_mort, paste0("q_", sex))) {
-        d_base_mort[[paste0("q_", sex)]]
-    } else if(hasName(d_base_mort, paste0("rate_", sex))) {
-        d_base_mort[[paste0("rate_", sex)]]
-    }
-    
-    ## overall baseline survival at attained age a
-    ## -> hazard summed up to a-1
-    base_surv <- lag(exp(-cumsum(q_base)), n=1L, default=1)
     
     #####-----------------------------------------------------------------------
     ## for each cancer site
     ## CER / LEAR / REID / REIC / RADS
-    cancer_sites <- vapply(l_param[["cancer_site"]], function(cs) {
-        cs[["cancer_site"]] }, FUN.VALUE=character(1)) |>
-        unique()
-    
     ## earliest age at exposure over cancer sites
     agex_1st <- lapply(l_err_ear, function(ee) { ee[["agex"]] }) |>
         unlist() |>
@@ -144,7 +173,8 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
                   d_base_cancer=base_cancer[cancer_sites],
                   sex          =sex,
                   age_attnd    =list(age_attnd),
-                  surv_base    =list(base_surv),
+                  surv_base    =list(surv_base),
+                  surv_exposed =list(surv_exposed),
                   agex_1st     =agex_1st,
                   age_max      =age_max,
                   metric       =list(metric))

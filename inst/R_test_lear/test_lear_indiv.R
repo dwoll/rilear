@@ -42,14 +42,16 @@ lat_eta <- list(all_solid =6,
                 breast    =6,
                 leuk_lymph=6.75)
 
+## TODO
+## when n = 1 and cancer_site = vector -> treat cancer_site as list
 expo_event <- gen_exposure(n          =1,
                            sex        ="m",
                            agex       =c(20),
                            dose_distr =c("fixed"),
                            dose_param =0.5,
-                           ddref      =1,
-                           # dose_rate  ="acute",
-                           cancer_site="all_solid")
+                           ddref      =1.5,
+                           dose_rate  ="acute",
+                           cancer_site=list(c("all_solid", "leuk_lymph")))
 
 expo_event <- gen_exposure(n          =2,
                            sex        ="f",
@@ -86,13 +88,13 @@ p_mc <- rilear:::gen_param_mc(exposure         =expo_event,
 
 get_lear_indiv(l_param          =p_mc[[1]],
                risk_model      =rm,
-               # risk_model_mort =rm_mort,
+               risk_model_mort =rm_mort,
                base_cancer     =base_cancer,
-               # base_cancer_mort=base_cancer_mort,
+               base_cancer_mort=base_cancer_mort,
                d_base_mort     =d_lifetable_ger_2024W,
                age_max         =90,
                lat_method      ="ProZES",
-               metric          =c("LEAR", "RADS"))
+               metric          =c("LEAR", "RADS", "ELR"))
 
 ## breast agex 20, 500 mGy RadRAT 0.0338
 ## leukemia agex 20, 500 mGy RadRAT 0.00432

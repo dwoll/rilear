@@ -1,5 +1,7 @@
 # TODO
 
+  * Make sure that order of list components for cancer site etc. is correct for Map()
+  * Structure of cancer lists, risk model list: Incidence, mortality
   * When considering several cancer sites, S_E has to use sum of mortality rates from all sites for REID / ELR
   * YLL according to Ulanowski et al. 2019 RADS eq. 15
   * Take into account Ulanowski et al. 2019 appendix incidence vs. mortality

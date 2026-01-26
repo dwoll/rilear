@@ -6,7 +6,8 @@
 #####---------------------------------------------------------------------------
 
 get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
-                      sex, age_attnd, surv_base, agex_1st, age_max, metric) {
+                      sex, age_attnd, surv_base, surv_exposed,
+                      agex_1st, age_max, metric) {
     wt_transfer  <- cancer_site[["wt_transfer"]]
     idx_agex_1st <- which(age_attnd == agex_1st)
     cancer_base  <- d_base_cancer[[paste0("rate_", sex)]]
@@ -27,7 +28,7 @@ get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
         ELR=function(err) {
             risk_0 <- (cancer_base        *surv_base)[idx_keep]
             risk_E <- (cancer_base*(1+err)*surv_exposed)[idx_keep]
-            (risk_E - risk_0) / base_surv_agex_1st
+            (risk_E - risk_0)                        / surv_base_agex_1st
         },
         RADS=function(err) {
             ## CAVE

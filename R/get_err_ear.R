@@ -103,3 +103,20 @@ get_err_ear1_n <- function(exposure, cancer_site, age_attnd,
         l_err_ear
     }
 }
+
+#####---------------------------------------------------------------------------
+## for 1 cancer site: get excess force of cancer mortality (hazard)
+## for surv_exposed (necessary for REID, ELR)
+#####---------------------------------------------------------------------------
+
+get_qE1 <- function(cancer_site, err_ear, d_base_cancer_mort, sex) {
+    err_mort         <- err_ear[["err"]]
+    ear_mort         <- err_ear[["ear"]]
+    wt_transfer      <- cancer_site[["wt_transfer"]]
+    cancer_base_mort <- d_base_cancer_mort[[paste0("rate_", sex)]]
+    
+    q_excess <- wt_transfer["ERR"]*err_mort*cancer_base_mort +
+        wt_transfer["EAR"]*ear_mort
+    
+    q_excess
+}
