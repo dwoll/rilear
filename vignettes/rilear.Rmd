@@ -67,70 +67,125 @@ Interpolated for individual years of age.
 ### Without uncertainty
 
 ```{r}
-## ERR / EAR risk models for solid cancer incidence and mortality
-rm_incid <- rm_solid_incid_walsh2021()
-rm_mort  <- rm_solid_mort_sumray()
+rm <- list(all_solid =rm_solid_incid_walsh2021(),
+           breast    =rm_breast_incid_walsh2021(),
+           leuk_lymph=rm_leuk_incid_walsh2021())
 
-## single point estimate after two exposures at age 20, 21
-get_lear_indiv(l_param=list(exposure      =list(dose=c(0.5, 0.7),
-                                                agex=c(20, 21)),
-                            param_err     =rm_incid$err$param,
-                            param_ear     =rm_incid$ear$param,
-                            param_err_mort=rm_mort$err$param,
-                            param_ear_mort=rm_mort$ear$param,
-                            wt_transfer   =c(ERR=0.5, EAR=0.5),
-                            ddref         =1,
-                            lat_t0        =5,
-                            lat_eta       =6.25),
-               sex               ="f",
-               risk_model        =rm_incid,
-               risk_model_mort   =rm_mort,
-               d_base_cancer     =d_cancer_ger_incid_solidW_i,
-               d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-               d_base_mort       =d_lifetable_ger_2024W,
-               age_max           =95,
-               lat_method        ="ProZES",
-               metric            =c("LEAR", "RADS"))
+rm_mort <- list(all_solid =rm_solid_mort_sumray(),
+                breast    =rm_breast_incid_walsh2021(),
+                leuk_lymph=rm_leuk_incid_walsh2021())
+
+base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
+                    breast    =d_cancer_ger_incid_breastW_i,
+                    leuk_lymph=d_cancer_ger_incid_leuk_lymphW_i)
+
+base_cancer_mort <- list(all_solid =d_cancer_ger_mort_solidW_i,
+                         breast    =d_cancer_ger_mort_breastW_i,
+                         leuk_lymph=d_cancer_ger_mort_leuk_lymphW_i)
+
+wt_transfer <- list(all_solid =c(ERR=0.5, EAR=0.5),
+                    breast    =c(ERR=0.0, EAR=1.0),
+                    leuk_lymph=c(ERR=1.0, EAR=0.0))
+
+lat_t0 <- list(all_solid =4,
+               breast    =4,
+               leuk_lymph=1.5)
+
+lat_eta <- list(all_solid =6.25,
+                breast    =6.25,
+                leuk_lymph=7.66)
+
+expo_event <- gen_exposure(n          =2,
+                           sex        ="f",
+                           agex       =c(20, 21),
+                           dose_distr =c("fixed", "normal"),
+                           dose_param =list(0.5, c(mean=0.3, sd=0.05)),
+                           ddref      =c(1, 1.5),
+                           dose_rate  =c("acute", "acute"),
+                           cancer_site=list("all_solid",
+                                            c("all_solid", "leuk_lymph")))
+
+p_mc <- gen_param_mc(exposure         =expo_event,
+                     n_sim            =5L,
+                     wt_transfer      =wt_transfer,
+                     lat_t0           =lat_t0,
+                     lat_eta          =lat_eta,
+                     lat_method       ="ProZES",
+                     lat_fixed        =FALSE,
+                     wt_transfer_fixed=FALSE,
+                     ddref_fixed      =FALSE,
+                     risk_model       =rm,
+                     risk_model_mort  =rm_mort)
+
+get_lear_indiv(l_param         =p_mc[[1]],
+               risk_model      =rm,
+               risk_model_mort =rm_mort,
+               base_cancer     =base_cancer,
+               base_cancer_mort=base_cancer_mort,
+               d_base_mort     =d_lifetable_ger_2024W,
+               age_max         =90,
+               lat_method      ="ProZES",
+               metric          =c("LEAR", "RADS", "ELR"))
 ```
 
 ## Whole exposed population
 
 ```{r}
-## ERR / EAR risk models for solid cancer incidence and mortality
-rm_incid <- rm_solid_incid_walsh2021()
-rm_mort  <- rm_solid_mort_sumray()
-
-## generate list of 2 exposure events in consecutive years
 expo_event <- gen_exposure(n          =2,
-                           timing     =c(0, 1),
-                           dose_distr =c("normal", "triangular"),
-                           dose_param =list(c(mean=0.5, sd=0.05),
-                                            c(mode=0.5, min=0.1, max=0.6)))
+                           sex        ="f",
+                           timing     =1,
+                           dose_distr =c("normal", "fixed"),
+                           dose_param =list(c(mean=0.5, sd=0.015), 0.5),
+                           ddref      =c(1, 1),
+                           # dose_rate  ="acute",
+                           cancer_site=list("all_solid",
+                                            c("all_solid", "leuk_lymph")))
 
-## risk estimates for exposure of the population of Germany
-get_lear_pop(x       =d_pop_ger_country_2024L,
-             n_sim   =100L,
-             exposure=expo_event,
-             wt_transfer       =c(ERR=0.5, EAR=0.5),
-             lat_t0            =5,
-             lat_eta           =6,
-             lat_method        ="ProZES",
-             lat_fixed         =FALSE,
-             wt_transfer_fixed =FALSE,
-             ddref_fixed       =FALSE,
-             risk_model        =rm_solid_incid_walsh2021(),
-             risk_model_mort   =rm_solid_mort_sumray(),
-             stratify_sex      =TRUE,
-             pop_ref           =100000,
-             alpha             =0.05,
-             multicore         =FALSE,
-             n_cores_max       =10L,
-             n_cores_omit      =2L,
-             d_base_cancer     =d_cancer_ger_incid_solidW_i,
-             d_base_cancer_mort=d_cancer_ger_mort_solidW_i,
-             d_base_mort       =d_lifetable_ger_2024W,
-             metric            =c("LEAR", "RADS"),
-             age_max           =90)
+## generate sets of parameter settings
+## with cancer mortality
+rm <- list(all_solid =rm_solid_incid_walsh2021(),
+           breast    =rm_breast_incid_walsh2021(),
+           leuk_lymph=rm_leuk_incid_walsh2021())
+
+base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
+                    breast    =d_cancer_ger_incid_breastW_i,
+                    leuk_lymph=d_cancer_ger_incid_leuk_lymphW_i)
+
+wt_transfer <- list(all_solid =c(ERR=0.5, EAR=0.5),
+                    breast    =c(ERR=0.0, EAR=1.0),
+                    leuk_lymph=c(ERR=1.0, EAR=0.0))
+
+lat_t0 <- list(all_solid =5,
+               breast    =5,
+               leuk_lymph=1.5)
+
+lat_eta <- list(all_solid =6,
+                breast    =6,
+                leuk_lymph=6.75)
+
+## solid cancer risk estimates
+## for exposure of the population of Germany
+get_lear_pop(x                =d_pop_ger_country_2024L,
+             n_sim            =10L,
+             exposure         =expo_event,
+             wt_transfer      =wt_transfer,
+             lat_t0           =lat_t0,
+             lat_eta          =lat_eta,
+             lat_method       ="ProZES",
+             lat_fixed        =FALSE,
+             wt_transfer_fixed=FALSE,
+             ddref_fixed      =FALSE,
+             risk_model       =rm,
+             stratify_sex     =TRUE,
+             pop_ref          =100000,
+             alpha            =0.05,
+             multicore        =FALSE,
+             n_cores_max      =10L,
+             n_cores_omit     =2L,
+             base_cancer      =base_cancer,
+             d_base_mort      =d_lifetable_ger_2024W,
+             metric           =c("LEAR", "RADS"),
+             age_max          =90)
 ```
 
 # Calculations
@@ -139,5 +194,6 @@ get_lear_pop(x       =d_pop_ger_country_2024L,
   - ProZES: Ulanowski et al. Radiat Environ Biophys 2020. DOI: 10.1007/s00411-020-00866-7
   - RadRAT: Berrington de Gonzalez et al. JRP 2012. DOI: 10.1088/0952-4746/32/3/205
   - Sasaki et al. J Radiat Prot Res 2023 DOI: 10.14407/jrpr.2022.00213
+  - Ulanowski et al. Radiat Environ Biophys 2019. DOI 10.1007/s00411-019-00794-1.
   - Walsh et al. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0
   - LARisk: Lee et al. DOI: 10.32614/CRAN.package.LARisk

@@ -128,7 +128,7 @@ get_lear_indiv_mc <- function(exposure,
   rownames(d_learL) <- NULL
   
     ## aggregate MC results for summarizing distribution
-    if(aggr_mc) {
+    d_out <- if(aggr_mc) {
         d_learL |>
             group_by(.data$site, .data$metric) |>
             summarize(mean_rsk  =mean(.data$value),
@@ -139,4 +139,7 @@ get_lear_indiv_mc <- function(exposure,
     } else {
         d_learL
     }
+    
+    d_out |>
+      as.data.frame()
 }

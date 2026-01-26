@@ -21,8 +21,7 @@ get_lear1_pop1 <- function(x,
                            # base_cancer_mort,
                            # d_base_mort,
                            # lat_method
-                           ...
-                          ) {
+                           ...) {
     stopifnot(nrow(x) == 1L)
     
     if(x[["age_n"]] > age_max) {
@@ -62,7 +61,8 @@ get_lear1_pop1 <- function(x,
 get_lear1_pop <- function(l_param, d_pop, ...) {
     ## split population into separate rows and get result for each one
     l_pop_spl <- split(d_pop, seq_len(nrow(d_pop)))
-    l_out     <- lapply(l_pop_spl, get_lear1_pop1, l_param=l_param, ...)
+    l_out0    <- lapply(l_pop_spl, get_lear1_pop1, l_param=l_param, ...)
+    l_out     <- Filter(Negate(is.null), l_out0)
     bind_rows(l_out)
 }
 
@@ -242,7 +242,8 @@ get_lear_pop <- function(x,        # population
                    median_abs=round(.data$median_abs),
                    PIlo_abs  =round(.data$PIlo_abs),
                    PIup_abs  =round(.data$PIup_abs)) |>
-            rename(pop=pop_sex)
+            rename(pop=pop_sex) |>
+            dplyr::select("site", "metric", "sex", "pop", "pop_ref", everything())
     } else {
         d_learL |>
             ## population weighting
@@ -275,8 +276,9 @@ get_lear_pop <- function(x,        # population
                    median_abs=round(median_abs),
                    PIlo_abs  =round(PIlo_abs),
                    PIup_abs  =round(PIup_abs)) |>
-            dplyr::select("metric", "pop", "pop_ref", everything())
+            dplyr::select("site", "metric", "pop", "pop_ref", everything())
     }
     
-    d_lear_out
+    d_lear_out |>
+        as.data.frame()
 }

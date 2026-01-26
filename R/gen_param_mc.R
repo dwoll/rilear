@@ -31,8 +31,7 @@ gen_param_mc <- function(exposure,
     ## add sex, agex / timing, dose_rate, cancer site list
     #####-----------------------------------------------------------------------
     
-    l_expo_mc <- lapply(exposure, sim_exposure, n_sim=n_sim, transpose=FALSE)
-    # l_expo_mc  <- inv_l_dose(l_expo_mc0) # 1 component per n_sim
+    l_expo_mc <- lapply(exposure, sim_exposure, n_sim=n_sim)
 
     #####-----------------------------------------------------------------------
     ## for each cancer site: risk model coefficients, ERR-EAR transfer, latency

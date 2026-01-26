@@ -14,8 +14,8 @@ library(rilear)
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm <- list(breast    =rm_breast_incid_walsh2021(),
-           all_solid =rm_solid_incid_walsh2021(),
+rm <- list(all_solid =rm_solid_incid_walsh2021(),
+           breast    =rm_breast_incid_walsh2021(),
            leuk_lymph=rm_leuk_incid_walsh2021())
 
 rm_mort <- list(all_solid =rm_solid_mort_sumray(),
@@ -73,7 +73,7 @@ expo_event <- gen_exposure(n          =2,
                            cancer_site=list("breast",
                                             c("all_solid", "breast")))
 
-p_mc <- rilear:::gen_param_mc(exposure         =expo_event,
+p_mc <- gen_param_mc(exposure         =expo_event,
                               n_sim            =10,
                               wt_transfer      =wt_transfer,
                               lat_t0           =lat_t0,

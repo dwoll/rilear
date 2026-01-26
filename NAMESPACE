@@ -12,7 +12,7 @@ importFrom(dplyr,
            summarize, ungroup)
 importFrom(rlang, .data)
 
-export(gen_exposure,
+export(gen_exposure, gen_param_mc,
        get_lear_indiv, get_lear_indiv_mc,
        get_lear_pop, get_lear1_pop, get_lear1_pop1,
        interpol_cancer_rate,
@@ -21,4 +21,5 @@ export(gen_exposure,
        rm_solid_mort_sumray,
        rm_solid_incid_walsh2021,
        rm_breast_incid_walsh2021,
-       rm_leuk_incid_walsh2021)
+       rm_leuk_incid_walsh2021,
+       sim_exposure)

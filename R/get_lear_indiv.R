@@ -25,12 +25,17 @@ sum_err_ear_a <- function(cancer_site, err_ear_a) {
     })
     
     l_err_ear_sel <- Filter(Negate(is.null), l_err_ear_sel0)
-    err  <- do.call(cbind, lapply(l_err_ear_sel, function(ees) { ees[["err"]] }))
-    ear  <- do.call(cbind, lapply(l_err_ear_sel, function(ees) { ees[["ear"]] }))
-    agex <- vapply(l_err_ear_sel, function(ees) { ees[["agex"]] }, FUN.VALUE=numeric(1))
-    list(err =rowSums(err, na.rm=TRUE),
-         ear =rowSums(ear, na.rm=TRUE),
-         agex=agex)
+    
+    if(length(l_err_ear_sel) >= 1L) {
+        err  <- do.call(cbind, lapply(l_err_ear_sel, function(ees) { ees[["err"]] }))
+        ear  <- do.call(cbind, lapply(l_err_ear_sel, function(ees) { ees[["ear"]] }))
+        agex <- vapply(l_err_ear_sel, function(ees) { ees[["agex"]] }, FUN.VALUE=numeric(1))
+        list(err =rowSums(err, na.rm=TRUE),
+             ear =rowSums(ear, na.rm=TRUE),
+             agex=agex)
+    } else {
+        NULL
+    }
 }
 
 ## get LEAR for 1 person
@@ -41,6 +46,7 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
                            ##              sex, agex, dose (Gy or Sv), ddref, dose_rate,
                            ##              cancer_site
                            ## cancer_site: for each cancer site:
+                           ##              cancer_site
                            ##              param_err / ear / err_mort / ear_mort,
                            ##              wt_transfer, lat_t0, lat_eta
                            l_param,
@@ -99,10 +105,12 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     
     #####-----------------------------------------------------------------------
     ## for each cancer site: total ERR / EAR per attained age
-    l_err_ear <- Map(sum_err_ear_a,
-                     l_param[["cancer_site"]],
-                     err_ear_a=list(l_err_ear_a))
+    l_err_ear0 <- Map(sum_err_ear_a,
+                      l_param[["cancer_site"]],
+                      err_ear_a=list(l_err_ear_a))
 
+    l_err_ear <- Filter(Negate(is.null), l_err_ear0)
+    
     #####-----------------------------------------------------------------------
     ## overall mortality rates baseline
     ## force of mortality (hazard) from life table ("q")
@@ -131,9 +139,11 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
         
         ## components may be NULL if agex > age_max
         l_err_ear_mort_a <- Filter(Negate(is.null), l_err_ear_mort_a0)
-        l_err_ear_mort   <- Map(sum_err_ear_a,
+        l_err_ear_mort0  <- Map(sum_err_ear_a,
                                 l_param[["cancer_site"]],
                                 err_ear_a=list(l_err_ear_mort_a))
+        
+        l_err_ear_mort <- Filter(Negate(is.null), l_err_ear_mort0)
         
         ## for each cancer site: excess force of mortality
         l_q_excess0 <- Map(get_qE1,
@@ -163,25 +173,29 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     ## for each cancer site
     ## CER / LEAR / REID / REIC / RADS
     ## earliest age at exposure over cancer sites
-    agex_1st <- lapply(l_err_ear, function(ee) { ee[["agex"]] }) |>
-        unlist() |>
-        min()
-    
-    l_lear <- Map(get_lear1,
-                  l_param[["cancer_site"]],
-                  err_ear      =l_err_ear,
-                  d_base_cancer=base_cancer[cancer_sites],
-                  sex          =sex,
-                  age_attnd    =list(age_attnd),
-                  surv_base    =list(surv_base),
-                  surv_exposed =list(surv_exposed),
-                  agex_1st     =agex_1st,
-                  age_max      =age_max,
-                  metric       =list(metric))
-    
-    #####-----------------------------------------------------------------------
-    ## total CER / LEAR / REID / REIC / RADS
-    lear_total <- colSums(do.call(rbind, l_lear))
-    c(l_lear, total=list(lear_total)) |>
-        bind_rows(.id="site")
+    if(length(l_err_ear) >= 1L) {
+        agex_1st <- lapply(l_err_ear, function(ee) { ee[["agex"]] }) |>
+            unlist() |>
+            min()
+        
+        l_lear <- Map(get_lear1,
+                      l_param[["cancer_site"]],
+                      err_ear      =l_err_ear,
+                      d_base_cancer=base_cancer[cancer_sites],
+                      sex          =sex,
+                      age_attnd    =list(age_attnd),
+                      surv_base    =list(surv_base),
+                      surv_exposed =list(surv_exposed),
+                      agex_1st     =agex_1st,
+                      age_max      =age_max,
+                      metric       =list(metric))
+        
+        #####-------------------------------------------------------------------
+        ## total CER / LEAR / REID / REIC / RADS
+        lear_total <- colSums(do.call(rbind, l_lear))
+        c(l_lear, total=list(lear_total)) |>
+            bind_rows(.id="site")
+    } else {
+        NULL
+    }
 }

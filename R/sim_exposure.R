@@ -38,7 +38,7 @@ dw_rtri <- function(n, t_mode, t_min, t_max) {
 ## possibly dependent on dose, dose_rate "acute" vs. "chronic"
 #####---------------------------------------------------------------------------
 
-sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE, transpose=FALSE) {
+sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE) {
     if(hasName(x, "sex")) {
         stopifnot(length(x[["sex"]]) == 1L)
         sex_mc <- rep(x[["sex"]], n_sim)

@@ -13,7 +13,7 @@ gen_exposure <- function(n,
                          dose_param,
                          dose_rate  ="acute",
                          ddref      =1,
-                         cancer_site="total") {
+                         cancer_site="all_solid") {
     sex <- match.arg(sex)
     
     ## use strict matching for dose_distr, dose_rate, cancer_site

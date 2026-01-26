@@ -24,13 +24,13 @@ expo_event <- gen_exposure(n          =2,
                            dose_param =list(c(mean=0.5, sd=0.015), 0.5),
                            ddref      =c(1, 1),
                            # dose_rate  ="acute",
-                           cancer_site=list("breast",
+                           cancer_site=list("all_solid",
                                             c("all_solid", "leuk_lymph")))
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm <- list(breast    =rm_breast_incid_walsh2021(),
-           all_solid =rm_solid_incid_walsh2021(),
+rm <- list(all_solid =rm_solid_incid_walsh2021(),
+           breast    =rm_breast_incid_walsh2021(),
            leuk_lymph=rm_leuk_incid_walsh2021())
 
 rm_mort <- list(all_solid =rm_solid_mort_sumray(),
@@ -57,29 +57,29 @@ lat_eta <- list(all_solid =6,
                 breast    =6,
                 leuk_lymph=6.75)
 
-p_mc <- rilear:::gen_param_mc(exposure         =expo_event,
-                              n_sim            =10L,
-                              wt_transfer      =wt_transfer,
-                              lat_t0           =lat_t0,
-                              lat_eta          =lat_eta,
-                              lat_method       ="ProZES",
-                              lat_fixed        =FALSE,
-                              wt_transfer_fixed=FALSE,
-                              ddref_fixed      =FALSE,
-                              risk_model       =rm,
-                              risk_model_mort  =rm_mort)
+p_mc <- gen_param_mc(exposure         =expo_event,
+                     n_sim            =10L,
+                     wt_transfer      =wt_transfer,
+                     lat_t0           =lat_t0,
+                     lat_eta          =lat_eta,
+                     lat_method       ="ProZES",
+                     lat_fixed        =FALSE,
+                     wt_transfer_fixed=FALSE,
+                     ddref_fixed      =FALSE,
+                     risk_model       =rm,
+                     risk_model_mort  =rm_mort)
 
 ## without cancer mortality
-p_mc <- rilear:::gen_param_mc(exposure         =expo_event,
-                              n_sim            =10L,
-                              wt_transfer      =wt_transfer,
-                              lat_t0           =lat_t0,
-                              lat_eta          =lat_eta,
-                              lat_method       ="ProZES",
-                              lat_fixed        =FALSE,
-                              wt_transfer_fixed=FALSE,
-                              ddref_fixed      =FALSE,
-                              risk_model       =rm)
+p_mc <- gen_param_mc(exposure         =expo_event,
+                     n_sim            =10L,
+                     wt_transfer      =wt_transfer,
+                     lat_t0           =lat_t0,
+                     lat_eta          =lat_eta,
+                     lat_method       ="ProZES",
+                     lat_fixed        =FALSE,
+                     wt_transfer_fixed=FALSE,
+                     ddref_fixed      =FALSE,
+                     risk_model       =rm)
 
 #####---------------------------------------------------------------------------
 ## solid cancer
@@ -91,7 +91,6 @@ d_pop_frankfurt <- d_pop_ger_district_2024L |>
 # d_pop_ger_country_2024L
 
 ## with cancer mortality
-library(rilear)
 get_lear_pop(x                =d_pop_frankfurt,
              n_sim            =10L,
              exposure         =expo_event,

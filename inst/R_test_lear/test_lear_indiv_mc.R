@@ -24,32 +24,30 @@ expo_event <- gen_exposure(n          =2,
                            cancer_site=list("breast",
                                             c("all_solid", "leuk_lymph")))
 
-rilear:::sim_exposure(x=list(sex        ="f",
-                             agex       =20,
-                             dose_param =0.5,
-                             ddref      =1.5,
-                             dose_rate  ="acute",
-                             cancer_site=c("all_solid", "leuk_lymph")),
-                  n_sim=10L,
-                  ddref_fixed=FALSE,
-                  transpose=TRUE)
+sim_exposure(x=list(sex        ="f",
+                    agex       =20,
+                    dose_param =0.5,
+                    ddref      =1.5,
+                    dose_rate  ="acute",
+                    cancer_site=c("all_solid", "leuk_lymph")),
+             n_sim=10L,
+             ddref_fixed=FALSE)
 
-rilear:::sim_exposure(x=list(sex="f", agex=20, dose_param=0.5),
-                      n_sim=10L,
-                      ddref_fixed=FALSE,
-                      transpose=FALSE)
+sim_exposure(x=list(sex="f", agex=20, dose_param=0.5),
+             n_sim=10L,
+             ddref_fixed=FALSE)
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm      <- list(breast    =rm_breast_incid_walsh2021(),
-                all_solid =rm_solid_incid_walsh2021(),
+rm      <- list(all_solid =rm_solid_incid_walsh2021(),
+                breast    =rm_breast_incid_walsh2021(),
                 leuk_lymph=rm_leuk_incid_walsh2021())
 
 rm_mort <- list(all_solid =rm_solid_mort_sumray(),
                 breast    =rm_solid_incid_sumray(),
                 leuk_lymph=rm_solid_mort_sumray())
 
-p_mc <- rilear:::gen_param_mc(exposure         =expo_event,
+p_mc <- gen_param_mc(exposure         =expo_event,
                               n_sim            =10L,
                               wt_transfer      =list(all_solid =c(ERR=0.5, EAR=0.5),
                                                      breast    =c(ERR=0.0, EAR=1.0),
