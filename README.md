@@ -15,17 +15,19 @@ A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/) 
  - Monte Carlo methods for assessing uncertainty for risk model coefficient estimates, dose distribution, ERR-EAR weights for risk transfer, DDREF, and the latency function
  - Possibility to define ERR / EAR risk models for cancer sites and flexibly use these models for risk calculation
  - Possibility to use own data for baseline cancer (mortality) rates, baseline overall mortality
- - Possibility to calculate expected lifetime excess cancer risk for a whole exposed population, including expected absolute number of cases
+ - Possibility to calculate projected lifetime excess cancer risk for a whole exposed population, including projected absolute number of cases
  
 ## Input data
 
   - ERR / EAR risk models: excess risk function, parameter estimates & covariance matrix
   - Baseline life table / overall mortality rates (stratified by sex, age group)
   - Baseline cancer rates (stratified by sex, age group)
-  - Baseline cancer mortality rates (stratified by sex, age group) - for REID / REIC, ELR, RADS
+  - Baseline cancer mortality rates (stratified by sex, age group) - for REID / REIC, ELR
   - Population data (stratified by sex, age group)
 
 # Included risk models
+
+**TODO** More need to be added.
 
   - `rm_solid_incid_walsh2021()`: Solid cancer incidence from Walsh et al. 2021
   - `rm_breast_incid_walsh2021()`: Breast cancer incidence from Walsh et al. 2021
@@ -36,6 +38,8 @@ A tool similar to [NCI RadRAT](https://radiationcalculators.cancer.gov/radrat/) 
 # Included cancer rates
 
 All stratified by sex, age group. Interpolated for individual years of age.
+
+**TODO** More need to be added.
 
 ## Incidence
 
@@ -75,5 +79,6 @@ Interpolated for individual years of age.
   - RadRAT: Berrington de Gonzalez et al. JRP 2012. DOI: 10.1088/0952-4746/32/3/205
   - Sasaki et al. J Radiat Prot Res 2023 DOI: 10.14407/jrpr.2022.00213
   - [EPA Blue Book](https://www.epa.gov/system/files/documents/2025-03/402-r-99-003_508-d.pdf)
+  - Ulanowski et al. Radiat Environ Biophys 2019. DOI 10.1007/s00411-019-00794-1.
   - Walsh et al. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0
   - LARisk: Lee et al. DOI: 10.32614/CRAN.package.LARisk
