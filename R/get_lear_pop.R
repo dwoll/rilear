@@ -242,7 +242,7 @@ get_lear_pop <- function(x,        # population
                    median_abs=round(.data$median_abs),
                    PIlo_abs  =round(.data$PIlo_abs),
                    PIup_abs  =round(.data$PIup_abs)) |>
-            rename(pop=pop_sex) |>
+            rename(pop=.data$pop_sex) |>
             dplyr::select("site", "metric", "sex", "pop", "pop_ref", everything())
     } else {
         d_learL |>
@@ -273,9 +273,9 @@ get_lear_pop <- function(x,        # population
                    PIlo_ref  =round((pop_ref/pop_total)*.data$PIlo_abs),
                    PIup_ref  =round((pop_ref/pop_total)*.data$PIup_abs),
                    mean_abs  =round(.data$mean_abs),
-                   median_abs=round(median_abs),
-                   PIlo_abs  =round(PIlo_abs),
-                   PIup_abs  =round(PIup_abs)) |>
+                   median_abs=round(.data$median_abs),
+                   PIlo_abs  =round(.data$PIlo_abs),
+                   PIup_abs  =round(.data$PIup_abs)) |>
             dplyr::select("site", "metric", "pop", "pop_ref", everything())
     }
     

@@ -7,9 +7,9 @@ importFrom(parallel, clusterEvalQ, makeCluster, parLapply, stopCluster)
 importFrom(parallelly, availableCores)
 importFrom(mvtnorm, rmvnorm)
 importFrom(dplyr,
-           any_of, arrange, bind_cols, bind_rows, everything, filter,
-           group_by, if_else, left_join, mutate, n, rename, select,
-           summarize, ungroup)
+           all_of, any_of, arrange, bind_cols, bind_rows, everything,
+           filter, group_by, if_else, left_join, mutate, n, rename,
+           select, summarize, ungroup)
 importFrom(rlang, .data)
 
 export(gen_exposure, gen_param_mc,

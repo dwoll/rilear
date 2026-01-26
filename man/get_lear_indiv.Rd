@@ -6,7 +6,7 @@ Calculate the projected lifetime excess absolute cancer risk for a single person
 }
 \usage{
 get_lear_indiv(l_param, risk_model, risk_model_mort,
-               d_base_cancer, d_base_cancer_mort,
+               base_cancer, base_cancer_mort,
                d_base_mort, age_max,
                lat_method = c("ProZES", "RadRAT"),
                metric = c("LAR", "LEAR", "CER",

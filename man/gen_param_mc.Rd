@@ -27,6 +27,7 @@ gen_param_mc(exposure, n_sim = 1000L,
     }
   \item{n_sim}{Numer of simulated parameter settings for Monte Carlo approach to estimate uncertainty interval. See Details.}
   \item{wt_transfer}{A named list with one component per cancer site. Each component a named 2-vector giving the ERR / EAR weights used for risk transfer. This vector must have names \code{"ERR"} and \code{"EAR"}, and weights must be within [0, 1] as well as sum to 1.}
+  \item{lat_method}{Character indicating the S-shaped function used in ProZES or RadRAT.}
   \item{lat_t0}{A named list with one component per cancer site. Each component the central value For the S-shaped latency function.}
   \item{lat_eta}{A named list with one component per cancer site. Each component the width of the transition period from 0 to full risk for the S-shaped latency function. Used for argument \code{lat_method="ProZES"}.}
   \item{lat_fixed}{Set latency parameters \code{lat_t0} and \code{lat_eta} to a fixed value without uncertainty?}
@@ -70,7 +71,7 @@ A list with one component for each simulated parameter set. Each such component 
 \code{\link{gen_exposure}},
 \code{\link{sim_exposure}},
 \code{\link{get_lear_indiv}},
-\code{\link{get_lear_mc}},
+\code{\link{get_lear_indiv_mc}},
 \code{\link{get_lear_pop}}
 }
 \examples{
