@@ -48,23 +48,23 @@ rm_mort <- list(all_solid =rm_solid_mort_sumray(),
                 leuk_lymph=rm_solid_mort_sumray())
 
 p_mc <- gen_param_mc(exposure         =expo_event,
-                              n_sim            =10L,
-                              wt_transfer      =list(all_solid =c(ERR=0.5, EAR=0.5),
-                                                     breast    =c(ERR=0.0, EAR=1.0),
-                                                     leuk_lymph=c(ERR=1.0, EAR=0.0)),
-                              lat_t0           =list(all_solid =5,
-                                                     breast    =5,
-                                                     leuk_lymph=1.5),
-                              lat_eta          =list(all_solid =6,
-                                                     breast    =6,
-                                                     leuk_lymph=6.75),
-                              lat_method       ="ProZES",
-                              lat_fixed        =FALSE,
-                              wt_transfer_fixed=FALSE,
-                              ddref_fixed      =FALSE,
-                              ##
-                              risk_model       =rm,
-                              risk_model_mort  =rm_mort)
+                     n_sim            =10L,
+                     wt_transfer      =list(all_solid =c(ERR=0.5, EAR=0.5),
+                                            breast    =c(ERR=0.0, EAR=1.0),
+                                            leuk_lymph=c(ERR=1.0, EAR=0.0)),
+                     lat_t0           =list(all_solid =5,
+                                            breast    =5,
+                                            leuk_lymph=1.5),
+                     lat_eta          =list(all_solid =6,
+                                            breast    =6,
+                                            leuk_lymph=6.75),
+                     lat_method       ="ProZES",
+                     lat_fixed        =FALSE,
+                     wt_transfer_fixed=FALSE,
+                     ddref_fixed      =FALSE,
+                     ##
+                     risk_model       =rm,
+                     risk_model_mort  =rm_mort)
 
 #####---------------------------------------------------------------------------
 ## solid incidence, lifetable, Walsh2021 model

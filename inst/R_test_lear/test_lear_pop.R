@@ -122,33 +122,6 @@ get_lear_pop(x                =d_pop_frankfurt,
 #                   -median_abs,
 #                   -mean_ref, -median_ref, -PIlo_ref, -PIup_ref)
 
-## without cancer mortality
-get_lear_pop(x=d_pop_ger_country_2024L,
-             n_sim            =100,
-             exposure         =expo_event,
-             wt_transfer      =c(ERR=0.5, EAR=0.5),
-             lat_t0           =5,
-             lat_eta          =6,
-             lat_method       ="ProZES",
-             lat_fixed        =FALSE,
-             wt_transfer_fixed=FALSE,
-             ddref_fixed      =FALSE,
-             ##
-             risk_model       =rm_solid_incid_walsh2021(),
-             ##
-             stratify_sex     =FALSE,
-             pop_ref          =10000,
-             alpha            =0.05,
-             multicore        =TRUE,
-             n_cores_max      =10L,
-             n_cores_omit     =2L,
-             ##
-             d_base_cancer    =d_cancer_ger_incid_solidW_i,
-             d_base_mort      =d_lifetable_ger_2024W,
-             metric           =c("LEAR"),
-             ##
-             age_max          =90)
-
 #####---------------------------------------------------------------------------
 ## leukemia / lymphoma
 #####---------------------------------------------------------------------------

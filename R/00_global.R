@@ -6,13 +6,13 @@
 
 ## supported dose distributions
 ## see: gen_exposure(), sim_dose()
-dose_distr_have <- c("fixed",         # param = c(value)
-                     "normal",        # param = c(mean, sd)
-                     "lognormal",     # param = c(gmean, gsd)
-                     "triangular",    # param = c(mode, min, max)
-                     "logtriangular", # param = c(mode, min, max)
-                     "uniform",       # param = c(min, max)
-                     "loguniform")    # param = c(min, max)
+dose_distr_have <- c("Fixed value"  ="fixed",         # param = c(value)
+                     "Normal"       ="normal",        # param = c(mean, sd)
+                     "Lognormal"    ="lognormal",     # param = c(gmean, gsd)
+                     "Triangular"   ="triangular",    # param = c(mode, min, max)
+                     "Logtriangular"="logtriangular", # param = c(mode, min, max)
+                     "Uniform"      ="uniform",       # param = c(min, max)
+                     "Loguniform"   ="loguniform")    # param = c(min, max)
 
 ## available cancer sites
 cancer_sites_have <- c("all_solid",
@@ -131,7 +131,25 @@ inv_l_basic <- function(x) {
   l0 <- lapply(seq_len(comp_len), swap)
   
   setNames(l0, comp_names)
+}
+
+inv_l_dose_param <- function(x) {
+  comp_lens  <- vapply(x, get_len, FUN.VALUE=numeric(1))
+  comp_len   <- unique(comp_lens)
   
+  ## lengths of components must be identical
+  stopifnot(length(comp_len) == 1L)
+  
+  swap <- function(i) {
+    l <- lapply(seq_along(x), function(j) {
+      x[[j]][[i]]
+    })
+    
+    unlist(l)
+  }
+  
+  l0 <- lapply(seq_len(comp_len), swap)
+  l0
 }
 
 #####---------------------------------------------------------------------------
@@ -226,3 +244,23 @@ get_age_grp_mw <- function(s, end_max=105L, out=c("mid", "width")) {
         width
     }
 }
+
+d_ger_fedstates <- c("01"="Schleswig-Holstein",
+                     "02"="Hamburg",
+                     "03"="Niedersachsen",
+                     "04"="Bremen",
+                     "05"="Nordrhein-Westfalen",
+                     "06"="Hessen",
+                     "07"="Rheinland-Pfalz",
+                     "08"="Baden-Wuerttemberg",
+                     "09"="Bayern",
+                     "10"="Saarland",
+                     "11"="Berlin",
+                     "12"="Brandenburg",
+                     "13"="Mecklenburg-Vorpommern",
+                     "14"="Sachsen",
+                     "15"="Sachsen-Anhalt",
+                     "16"="Thueringen")
+
+d_ger_fedstates_inv <- setNames(names(d_ger_fedstates),
+                                unname(d_ger_fedstates))

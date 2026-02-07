@@ -10,14 +10,19 @@ dashboardSidebar(
         compact = FALSE,
         childIndent = TRUE,
         menuItem(
-            "Input data",
-            tabName="tab_baseline",
-            icon=icon("file-upload", lib="font-awesome")
+            "Define exposure",
+            tabName="tab_exposure",
+            icon=icon("bolt-lightning", lib="font-awesome")
         ),
         menuItem(
-            "Risk measures",
+            "Settings",
+            tabName="tab_settings",
+            icon=icon("sliders", lib="font-awesome")
+        ),
+        menuItem(
+            "Risk estimate",
             tabName="tab_lear",
-            icon=icon("table", lib="font-awesome")
+            icon=icon("chart-column", lib="font-awesome")
         ),
         menuItem(
             "About",

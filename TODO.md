@@ -1,8 +1,10 @@
 # TODO
 
+  * gen_exposure() needs to accept sex=NULL / missing for pop
+  * allow Excel input data
   * negative ELR possible, example from ?get_lear_indiv
   * gen_exposure(): when n = 1 and cancer_site = vector -> treat cancer_site as list
-  * Make sure that order of list components for cancer site etc. is correct for Map()
+  * Make sure that cancer site names are harmonized across lists, order of list components for cancer site etc. is correct for Map()
   * Structure of cancer lists, risk model list: Incidence, mortality
   * YLL according to Ulanowski et al. 2019 RADS eq. 15
   * Take into account Ulanowski et al. 2019 appendix incidence vs. mortality

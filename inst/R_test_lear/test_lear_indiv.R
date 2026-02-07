@@ -74,17 +74,17 @@ expo_event <- gen_exposure(n          =2,
                                             c("all_solid", "breast")))
 
 p_mc <- gen_param_mc(exposure         =expo_event,
-                              n_sim            =10,
-                              wt_transfer      =wt_transfer,
-                              lat_t0           =lat_t0,
-                              lat_eta          =lat_eta,
-                              lat_method       ="ProZES",
-                              lat_fixed        =FALSE,
-                              wt_transfer_fixed=FALSE,
-                              ddref_fixed      =FALSE,
-                              ##
-                              risk_model       =rm,
-                              risk_model_mort  =rm_mort)
+                     n_sim            =10,
+                     wt_transfer      =wt_transfer,
+                     lat_t0           =lat_t0,
+                     lat_eta          =lat_eta,
+                     lat_method       ="ProZES",
+                     lat_fixed        =FALSE,
+                     wt_transfer_fixed=FALSE,
+                     ddref_fixed      =FALSE,
+                     ##
+                     risk_model       =rm,
+                     risk_model_mort  =rm_mort)
 
 get_lear_indiv(l_param          =p_mc[[1]],
                risk_model      =rm,

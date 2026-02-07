@@ -9,8 +9,7 @@ fluidPage(
             collapsible = FALSE,
             p("The", a("rilear", href="https://github.com/dwoll/rilear/"),
               "package for", a("R", href="https://www.r-project.org/"),
-              "provides functions for assessing the lifetime excess absolute risk from radiation exposure. Based on models for excess relative and excess absolute cancer risk for external low-LET radiation exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events and simultaneous application to a whole population to project total number of expected cancer cases."),
-
+              "provides functions for projecting the lifetime excess absolute risk from radiation exposure. Based on models for excess relative risk (ERR) and excess absolute cancer risk (EAR) for external low-LET radiation exposure. Risk measures include LAR / LEAR / CER, REID / REIC, ELR, and RADS. Supports multiple exposure events and simultaneous application to a whole population to project the total number of expected cancer cases."),
             h6("Author"),
             p("'rilear' and this web application are written by:", br(),
               "Daniel", HTML("Wollschl&auml;ger"), br(),
@@ -32,6 +31,7 @@ fluidPage(
                     tags$li("ProZES: Ulanowski et al. Radiat Environ Biophys 2020. DOI: 10.1007/s00411-020-00866-7"),
                     tags$li("RadRAT: Berrington de Gonzalez et al. JRP 2012. DOI: 10.1088/0952-4746/32/3/205"),
                     tags$li("Sasaki et al. J Radiat Prot Res 2023 DOI: 10.14407/jrpr.2022.00213"),
+                    tags$li("Ulanowski et al. Radiat Environ Biophys 2019. DOI 10.1007/s00411-019-00794-1."),
                     tags$li("Walsh et al. Radiat Environ Biophys 2019. DOI: 10.1007/s00411-021-00910-0"),
                     tags$li("LARisk: Lee et al. DOI: 10.32614/CRAN.package.LARisk"))
         ),
