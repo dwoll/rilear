@@ -1,0 +1,23 @@
+---
+title: "GUI for rilear: Lifetime Excess Absolute Risk"
+output: rmarkdown::html_vignette
+description: >
+  Describe web-based GUI for package rilear to
+  calculate lifetime excess absolute risk measures.
+vignette: >
+  %\VignetteIndexEntry{GUI for rilear: Lifetime Excess Absolute Risk}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse=TRUE, comment="#")
+```
+
+```{r}
+library(rilear)
+```
+
+Baesd on Shiny.
+
+**TODO**

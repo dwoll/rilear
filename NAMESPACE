@@ -22,4 +22,5 @@ export(gen_exposure, gen_param_mc,
        rm_solid_incid_walsh2021,
        rm_breast_incid_walsh2021,
        rm_leuk_incid_walsh2021,
+       run_gui,
        sim_exposure)

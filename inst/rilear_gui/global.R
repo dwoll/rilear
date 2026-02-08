@@ -41,18 +41,18 @@ ld_region <- list(ger_fedstate=data.frame(DEBKG_ID=l_map$ger_fedstate$DEBKG_ID,
 ## 11011011 "Berlin-Lichtenberg"               
 ## 11012012 "Berlin-Reinickendorf"
 
-l_region <- list(ger_fedstate    =setNames(l_ger_map[["fedstate"]]$GEN,
-                                           l_ger_map[["fedstate"]]$AGS),
-                 ger_district    =setNames(l_ger_map[["district"]]$GEN,
-                                           l_ger_map[["district"]]$AGS) # ,
-                 # ger_municipality=setNames(l_ger_map[["municipality"]]$GEN,
-                 #                           l_ger_map[["municipality"]]$AGS)
+l_region <- list(ger_fedstate    =setNames(l_map[["ger_fedstate"]]$GEN,
+                                           l_map[["ger_fedstate"]]$AGS),
+                 ger_district    =setNames(l_map[["ger_district"]]$GEN,
+                                           l_map[["ger_district"]]$AGS) # ,
+                 # ger_municipality=setNames(l_map[["ger_municipality"]]$GEN,
+                 #                           l_map[["ger_municipality"]]$AGS)
                  )
 
-l_region_inv <- list(ger_fedstate    =setNames(l_ger_map[["fedstate"]]$AGS,
-                                               l_ger_map[["fedstate"]]$GEN),
-                     ger_district    =setNames(l_ger_map[["district"]]$AGS,
-                                               l_ger_map[["district"]]$GEN) # ,
-                     # ger_municipality=setNames(l_ger_map[["municipality"]]$AGS,
-                     #                           l_ger_map[["municipality"]]$GEN)
+l_region_inv <- list(ger_fedstate    =setNames(l_map[["ger_fedstate"]]$AGS,
+                                               l_map[["ger_fedstate"]]$GEN),
+                     ger_district    =setNames(l_map[["ger_district"]]$AGS,
+                                               l_map[["ger_district"]]$GEN) # ,
+                     # ger_municipality=setNames(l_map[["ger_municipality"]]$AGS,
+                     #                           l_map[["ger_municipality"]]$GEN)
                      )

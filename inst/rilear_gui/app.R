@@ -2,6 +2,7 @@ library(shiny)
 library(rilear)
 library(bs4Dash)
 library(leaflet)
+library(shinyWidgets)
 
 source("global.R", encoding="UTF8")
 
@@ -13,8 +14,9 @@ ui <- dashboardPage(
     # theme = "custom.css",
     title="Lifetime Excess Absolute Risk after Radiation Exposure",
     dark=NULL,
-    help=FALSE,
+    help=NULL,
     sidebar=source("app_ui_sidebar.R", encoding="UTF8")$value,
+    controlbar=source("app_ui_controlbar.R", encoding="UTF8")$value,
     header=dashboardHeader(
         tags$code(tags$h3("Lifetime Excess Absolute Risk after Radiation Exposure"))
     ),
@@ -52,6 +54,7 @@ server <- function(input, output, session) {
                 
             leaflet() |>
                 addTiles() |>
+                setView(lng=10.5, lat=51.3, zoom=6) |>
                 addPolygons(data       =map_sel,
                             fillColor  ="white",
                             fillOpacity=0.5,
@@ -72,7 +75,7 @@ server <- function(input, output, session) {
                             layerId    =~DEBKG_ID,
                             group      =~AGS,
                             label      =~GEN) |>
-                hideGroup(group=map_sel[["AGS"]]) # nc$CNTY_ID
+                hideGroup(group=map_sel[["AGS"]])
         } else {
             NULL
         }
@@ -91,13 +94,57 @@ server <- function(input, output, session) {
         }
     })
 
-    #define leaflet proxy for second regional level map
-    proxy <- leafletProxy("map_pop_in")
-    map_sel_regions <- reactiveValues()
+    #define leaflet proxy for updating etc.
+    map_pop_in_proxy <- leafletProxy("map_pop_in")
+    map_sel_regions  <- reactiveValues()
 
+    # map_pop_in_update <- function(pop_in) {
+    #     map_sel <- l_map[[pop_in]]
+    #     map_pop_in_proxy |>
+    #         clearShapes() |>
+    #         clearControls() |>
+    #         clearMarkers() |>
+    #         addTiles() |>
+    #         setView(lng=10.5, lat=51.3, zoom=6) |>
+    #         addPolygons(data       =map_sel,
+    #                     fillColor  ="white",
+    #                     fillOpacity=0.5,
+    #                     color      ="black",
+    #                     stroke     =TRUE,
+    #                     weight     =1,
+    #                     ## need different ID than other layer
+    #                     ## must be unique across whole map
+    #                     layerId    =~OBJID,
+    #                     group      ="regions",
+    #                     label      =~GEN) |>
+    #         addPolygons(data       =map_sel,
+    #                     fillColor  ="red",
+    #                     fillOpacity=0.5,
+    #                     weight     =1,
+    #                     color      ="black",
+    #                     stroke     =TRUE,
+    #                     layerId    =~DEBKG_ID,
+    #                     group      =~AGS,
+    #                     label      =~GEN) |>
+    #         hideGroup(group=map_sel[["AGS"]])
+    # }
+    
+    # observe({
+    #     pop_in <- input$d_pop_in
+    #     if(!is.null(pop_in)) {
+    #         if(!(pop_in %in% c("ger_country", "custom"))) {
+    #             map_pop_in_update(pop_in)
+    #         }
+    #     }
+    # })
+    
     ## when region is clicked on map
     ## update map_sel_regions reactive values
     ## add / remove from selectizeInput() widget
+    # observeEvent(input$map_pop_in_click, {
+    #     tmp <- 0
+    # })
+    
     observeEvent(input$map_pop_in_shape_click, {
         if(input$map_pop_in_shape_click$group == "regions") {
             d_click_id <- ld_region[[input$d_pop_in]] |>
@@ -107,7 +154,7 @@ server <- function(input, output, session) {
                                         unique(d_click_id[["AGS"]])) |>
                 unique()
             
-            proxy |>
+            map_pop_in_proxy |>
                 showGroup(group=unique(d_click_id[["AGS"]]))
         } else {
             d_click_id <- ld_region[[input$d_pop_in]] |>
@@ -116,17 +163,21 @@ server <- function(input, output, session) {
             map_sel_regions$groups <- setdiff(map_sel_regions$groups,
                                               unique(d_click_id[["AGS"]]))
             
-            proxy |>
+            map_pop_in_proxy |>
                 hideGroup(group=input$map_pop_in_shape_click$group)
         }
         
         d_sel_id <- ld_region[[input$d_pop_in]] |>
             dplyr::filter(AGS %in% map_sel_regions$groups)
         
-        updateSelectizeInput(session,
-                             inputId ="sel_pop_in_ags",
-                             choices =l_region_inv[[input$d_pop_in]],
-                             selected=unique(d_sel_id[["AGS"]]))
+        # updateSelectizeInput(session,
+        #                      inputId ="sel_pop_in_ags",
+        #                      choices =l_region_inv[[input$d_pop_in]],
+        #                      selected=unique(d_sel_id[["AGS"]]))
+        updatePickerInput(session,
+                          inputId ="sel_pop_in_ags",
+                          choices =l_region_inv[[input$d_pop_in]],
+                          selected=unique(d_sel_id[["AGS"]]))
     })
     
     ## if regions are added / removed via the selectizeInput()
@@ -142,13 +193,13 @@ server <- function(input, output, session) {
         ## update reactive values and map
         if(length(removed_via_selectInput) > 0) {
             map_sel_regions$groups <- input$sel_pop_in_ags
-            proxy |>
+            map_pop_in_proxy |>
                 hideGroup(group=removed_via_selectInput)
         }
         
         if(length(added_via_selectInput) > 0) {
             map_sel_regions$groups <- input$sel_pop_in_ags
-            proxy |>
+            map_pop_in_proxy |>
                 showGroup(group=added_via_selectInput)
         }
     }, ignoreNULL=FALSE)
@@ -178,12 +229,22 @@ server <- function(input, output, session) {
             # map_sel_regions$groups <- vector()
             region_inv <- l_region_inv[[input$d_pop_in]]
             tagList(leafletOutput("map_pop_in"),
-                    selectizeInput("sel_pop_in_ags",
-                                   label="Selected regions",
-                                   choices=region_inv,
-                                   selected=region_inv,
-                                   multiple=TRUE)
-                    )
+                    # selectizeInput("sel_pop_in_ags",
+                    #                label="Selected regions",
+                    #                choices=region_inv,
+                    #                selected=region_inv,
+                    #                multiple=TRUE),
+                    pickerInput(
+                        inputId ="sel_pop_in_ags", 
+                        label   ="Selected regions",
+                        choices =region_inv, 
+                        selected=region_inv,
+                        multiple=TRUE,
+                        options =pickerOptions(
+                            actionsBox=TRUE, 
+                            size      =10,
+                            selectedTextFormat="count > 5"
+                        )))
         }
     })
     
@@ -396,13 +457,13 @@ server <- function(input, output, session) {
     
     output$ui_settings_multicore <- renderUI({
         if(isTRUE(input$settings_multicore)) {
-            tagList(numericInput("settings_multicore_n_cores_max",
+            tagList(numericInput("settings_n_cores_max",
                                  label="Max number of cores to use",
                                  value=1L,
                                  min=1L,
                                  max=99L,
                                  step=1L),
-                    numericInput("settings_multicore_n_omit",
+                    numericInput("settings_n_cores_omit",
                                  label="Spare at least how many cores?",
                                  value=2L,
                                  min=1L,
@@ -416,7 +477,7 @@ server <- function(input, output, session) {
     
     get_d_pop_in <- reactive({
         if(!is.null(input$d_pop_in)) {
-            d_pop_in <- if(input$d_pop_in == "ger_country") {
+            if(input$d_pop_in == "ger_country") {
                 d_pop_ger_country_2024L
             } else if(input$d_pop_in      == "ger_fedstate") {
                 ags_sel <- input$sel_pop_in_ags
@@ -610,7 +671,7 @@ server <- function(input, output, session) {
                                      pop_ref          =pop_ref,
                                      alpha            =alpha,
                                      multicore        =multicore,
-                                     n_cores_max      =multicore,
+                                     n_cores_max      =n_cores_max,
                                      n_cores_omit     =n_cores_omit,
                                      base_cancer      =base_cancer,
                                      # base_cancer_mort =base_cancer_mort,
@@ -624,9 +685,16 @@ server <- function(input, output, session) {
             }
         })
 
-        DT::datatable(d_lear) |>
+        DT::datatable(d_lear,
+                      extensions=c('Buttons', 'Scroller'),
+                      options   =list(deferRender=TRUE,
+                                      scrollX    =200,
+                                      scroller   =TRUE,
+                                      dom        ='Bfrtip',
+                                      buttons    =list(list(extend ='collection',
+                                                            buttons=c('csv', 'excel'),
+                                                            text   ='Download')))) |>
             DT::formatRound(columns=cols_numeric, digits=2)
-        
     })
 }
 
