@@ -10,7 +10,7 @@ dashboardSidebar(
         compact = FALSE,
         childIndent = TRUE,
         menuItem(
-            "Define exposure",
+            "Exposure",
             tabName="tab_exposure",
             icon=icon("bolt-lightning", lib="font-awesome")
         ),
@@ -20,7 +20,7 @@ dashboardSidebar(
             icon=icon("sliders", lib="font-awesome")
         ),
         menuItem(
-            "Risk estimate",
+            "Risk",
             tabName="tab_lear",
             icon=icon("chart-column", lib="font-awesome")
         ),

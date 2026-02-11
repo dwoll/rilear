@@ -10,6 +10,7 @@ fluidPage(
             uiOutput("ui_target_indiv"),
             uiOutput("ui_target_pop"),
             uiOutput("ui_target_pop_map"),
+            uiOutput("ui_target_pop_picker"),
             # uiOutput("ui_target_pop_ags"),
             uiOutput("ui_n_expo_events"),
             uiOutput("ui_expo_events")

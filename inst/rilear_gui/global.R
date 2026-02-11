@@ -6,11 +6,16 @@ trimWS <- function(x, side="both")  {
     gsub(pattern, "", x)
 }
 
-path_map <- "d:/rilear/inst/rilear_gui/data/"
-l_map <- list(ger_fedstate    =vect(paste0(path_map, "bundeslaender.gpkg")),
-              # ger_district    =vect(paste0(path_map, "landkreise3.gpkg"))
-              ger_district    =vect(paste0(path_map, "landkreise_simplify200.geojson")) #,
-              # ger_municipality=vect(paste0(path_map, "gemeinden_simplify200.geojson"))
+# path_map <- "d:/rilear/inst/rilear_gui/data/"
+f_ger_c  <- path_map <- system.file("rilear_gui/data/ger.gpkg",                       package="rilear")
+f_ger_fs <- path_map <- system.file("rilear_gui/data/bundeslaender.gpkg",             package="rilear")
+f_ger_d  <- path_map <- system.file("rilear_gui/data/landkreise_simplify200.geojson", package="rilear")
+f_ger_m  <- path_map <- system.file("rilear_gui/data/gemeinden_simplify200.geojson",  package="rilear")
+
+l_map <- list(ger_country     =vect(f_ger_c),
+              ger_fedstate    =vect(f_ger_fs),
+              ger_district    =vect(f_ger_d) #,
+              # ger_municipality=vect(f_ger_m)
               )
 
 ld_region <- list(ger_fedstate=data.frame(DEBKG_ID=l_map$ger_fedstate$DEBKG_ID,

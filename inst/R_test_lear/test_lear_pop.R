@@ -12,6 +12,7 @@ library(rilear)
 #####---------------------------------------------------------------------------
 
 d_pop     <- d_pop_ger_country_2024L
+d_pop     <- d_pop_ger_fedstate_2024L
 d_pop_spl <- split(d_pop, seq_len(nrow(d_pop)))
 
 ## use convenience function to generate list of exposure events
@@ -91,7 +92,7 @@ d_pop_frankfurt <- d_pop_ger_district_2024L |>
 # d_pop_ger_country_2024L
 
 ## with cancer mortality
-get_lear_pop(x                =d_pop_frankfurt,
+get_lear_pop(x                =d_pop, # d_pop_frankfurt,
              n_sim            =10L,
              exposure         =expo_event,
              wt_transfer      =wt_transfer,
@@ -102,7 +103,7 @@ get_lear_pop(x                =d_pop_frankfurt,
              wt_transfer_fixed=FALSE,
              ddref_fixed      =FALSE,
              risk_model       =rm,
-             # risk_model_mort  =rm_mort,
+             risk_model_mort  =rm_mort,
              stratify_sex     =TRUE,
              pop_ref          =100000,
              alpha            =0.05,
@@ -110,9 +111,9 @@ get_lear_pop(x                =d_pop_frankfurt,
              n_cores_max      =10L,
              n_cores_omit     =2L,
              base_cancer      =base_cancer,
-             # base_cancer_mort =base_cancer_mort,
+             base_cancer_mort =base_cancer_mort,
              d_base_mort      =d_lifetable_ger_2024W,
-             metric           =c("LEAR", "RADS"),
+             metric           =c("LEAR", "REID", "ELR", "RADS"),
              age_max          =90) |>
     as.data.frame()
 # |>

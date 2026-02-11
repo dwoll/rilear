@@ -116,6 +116,16 @@ get_lear_pop <- function(x,        # population
     risk_model      <- dots[["risk_model"]]
     risk_model_mort <- dots[["risk_model_mort"]] # may be NULL
     
+    ## aggregate population data over regions (AGS) if stratified
+    x_aggr <- if(hasName(x, "ags")) {
+        x |>
+            group_by(age_f, age_n, sex) |>
+            summarize(pop=sum(pop)) |>
+            ungroup()
+    } else {
+        x
+    }
+    
     ## random MC samples before doing parallel processing
     l_param <- gen_param_mc(n_sim            =n_sim,
                             exposure         =exposure,
@@ -146,7 +156,7 @@ get_lear_pop <- function(x,        # population
         l_lear_batch <- parLapply(cl,
                                   l_param_spl,
                                   get_lear1_pop_batch,
-                                  d_pop             =x,
+                                  d_pop             =x_aggr,
                                   metric            =metric,
                                   ##
                                   # age_max         =age_max,
@@ -166,7 +176,7 @@ get_lear_pop <- function(x,        # population
     } else {
         l_lear <- lapply(l_param,
                          get_lear1_pop,
-                         d_pop =x,
+                         d_pop =x_aggr,
                          metric=metric,
                          ##
                          # age_max         =age_max,
@@ -185,9 +195,9 @@ get_lear_pop <- function(x,        # population
     ## long format with respect to agex, metric, and MC run
     ## prediction intervals / a-posteriori distribution: simulate events
     metric_arg <- metric
-    vars_var <- metric
-    vars_id  <- setdiff(names(d_learW), vars_var)
-    d_learL <- d_learW |>
+    vars_var   <- metric
+    vars_id    <- setdiff(names(d_learW), vars_var)
+    d_learL    <- d_learW |>
         as.data.frame() |>
         reshape(direction="long",
                 idvar    =vars_id,
@@ -201,12 +211,12 @@ get_lear_pop <- function(x,        # population
     
     rownames(d_learL) <- NULL
     
-    d_pop_sex <- x |>
+    d_pop_sex <- x_aggr |>
         group_by(.data$sex) |>
         summarize(pop_sex=sum(.data$pop)) |>
         ungroup()
     
-    pop_total <- sum(x[["pop"]])
+    pop_total <- sum(x_aggr[["pop"]])
     
     ## aggregate MC results for summarizing distribution over whole population
     d_lear_out <- if(stratify_sex) {

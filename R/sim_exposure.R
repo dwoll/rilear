@@ -115,9 +115,10 @@ sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE) {
     
     #####-----------------------------------------------------------------------
     ## DDREF
-    ddref_mc <- # if(ddref_fixed) {
+    ddref_mc <- if(ddref_fixed) {
         rep(ddref, n_sim)
-    # } else {
+    } else {
+        rnorm(n_sim, mean=ddref, sd=0.01)
     #     ## TODO ProZES
     #     ## TODO RadRAT
     #     ## threshold low dose rate UNSCEAR 2003: < 6 mGy/h
@@ -133,7 +134,7 @@ sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE) {
     #     beta_beta  <- (1-norm_mean) * ((norm_mean*(1-norm_mean) / norm_var)-1)
     #     
     #     rbeta(n_sim, shape1=beta_alpha, shape2=beta_beta)*2.2 + 0.8
-    # }
+    }
     
     #####-----------------------------------------------------------------------
     ## dose rate and cancer site

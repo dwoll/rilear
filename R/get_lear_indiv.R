@@ -105,6 +105,7 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     
     #####-----------------------------------------------------------------------
     ## for each cancer site: total ERR / EAR per attained age
+    ## sum over exposure events
     l_err_ear0 <- Map(sum_err_ear_a,
                       l_param[["cancer_site"]],
                       err_ear_a=list(l_err_ear_a))
@@ -129,6 +130,7 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     ## if necessary & possible (REID / REIC, ELR)
     ## for each exposure event: get mortality ERR / EAR for each cancer site
     surv_exposed <- if(do_surv_exposed) {
+        ## for each exposure event: get ERR / EAR for each cancer site
         l_err_ear_mort_a0 <- lapply(l_param[["exposure"]],
                                     get_err_ear1_n,
                                     cancer_site=l_param[["cancer_site"]],
@@ -139,6 +141,9 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
         
         ## components may be NULL if agex > age_max
         l_err_ear_mort_a <- Filter(Negate(is.null), l_err_ear_mort_a0)
+        
+        ## for each cancer site: total ERR / EAR per attained age
+        ## sum over exposure events
         l_err_ear_mort0  <- Map(sum_err_ear_a,
                                 l_param[["cancer_site"]],
                                 err_ear_a=list(l_err_ear_mort_a))
@@ -171,9 +176,9 @@ get_lear_indiv <- function(## parameters with uncertainty - in list l_param
     
     #####-----------------------------------------------------------------------
     ## for each cancer site
-    ## CER / LEAR / REID / REIC / RADS
-    ## earliest age at exposure over cancer sites
+    ## get CER / LEAR / REID / REIC / RADS
     if(length(l_err_ear) >= 1L) {
+        ## earliest age at exposure over all cancer sites
         agex_1st <- lapply(l_err_ear, function(ee) { ee[["agex"]] }) |>
             unlist() |>
             min()

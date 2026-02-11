@@ -14,13 +14,22 @@ library(rilear)
 ## years are made consecutive from indicated start
 #####---------------------------------------------------------------------------
 
+expo_event <- gen_exposure(n          =1,
+                           sex        ="f",
+                           agex       =20,
+                           dose_distr ="normal",
+                           dose_param =c(mean=0.5, sd=0.015),
+                           ddref      =1,
+                           dose_rate  ="acute",
+                           cancer_site=c("all_solid", "leuk_lymph"))
+
 expo_event <- gen_exposure(n          =2,
                            sex        ="f",
                            agex       =c(20, 21),
                            dose_distr =c("normal", "fixed"),
                            dose_param =list(c(mean=0.5, sd=0.015), 0.5),
                            ddref      =c(1, 1.5),
-                           # dose_rate  ="acute",
+                           dose_rate  ="acute",
                            cancer_site=list("breast",
                                             c("all_solid", "leuk_lymph")))
 

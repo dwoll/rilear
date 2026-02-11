@@ -48,142 +48,64 @@ ui <- dashboardPage(
 
 server <- function(input, output, session) {
     output$map_pop_in <- renderLeaflet({
-        if(!is.null(input$d_pop_in) &&
-           !(input$d_pop_in %in% c("ger_country", "custom"))) {
-            map_sel <- l_map[[input$d_pop_in]]
-                
-            leaflet() |>
-                addTiles() |>
-                setView(lng=10.5, lat=51.3, zoom=6) |>
-                addPolygons(data       =map_sel,
-                            fillColor  ="white",
-                            fillOpacity=0.5,
-                            color      ="black",
-                            stroke     =TRUE,
-                            weight     =1,
-                            ## need different ID than other layer
-                            ## must be unique across whole map
-                            layerId    =~OBJID,
-                            group      ="regions",
-                            label      =~GEN) |>
-                addPolygons(data       =map_sel,
-                            fillColor  ="red",
-                            fillOpacity=0.5,
-                            weight     =1,
-                            color      ="black",
-                            stroke     =TRUE,
-                            layerId    =~DEBKG_ID,
-                            group      =~AGS,
-                            label      =~GEN) |>
-                hideGroup(group=map_sel[["AGS"]])
-        } else {
-            NULL
-        }
-    })
-    
-    output$ui_target_indiv <- renderUI({
-        if(input$exposure_target == "indiv") {
-            radioButtons("expo_sex",
-                         label="Sex",
-                         list("Female"="f",
-                              "Male"  ="m"),
-                         selected="f",
-                         inline=TRUE)
-        } else {
-            NULL
-        }
+        leaflet() |>
+            addTiles() |>
+            setView(lng=10.5, lat=51.3, zoom=6)
     })
 
-    #define leaflet proxy for updating etc.
+    ## define leaflet proxy for updating etc.
     map_pop_in_proxy <- leafletProxy("map_pop_in")
-    map_sel_regions  <- reactiveValues()
-
-    # map_pop_in_update <- function(pop_in) {
-    #     map_sel <- l_map[[pop_in]]
-    #     map_pop_in_proxy |>
-    #         clearShapes() |>
-    #         clearControls() |>
-    #         clearMarkers() |>
-    #         addTiles() |>
-    #         setView(lng=10.5, lat=51.3, zoom=6) |>
-    #         addPolygons(data       =map_sel,
-    #                     fillColor  ="white",
-    #                     fillOpacity=0.5,
-    #                     color      ="black",
-    #                     stroke     =TRUE,
-    #                     weight     =1,
-    #                     ## need different ID than other layer
-    #                     ## must be unique across whole map
-    #                     layerId    =~OBJID,
-    #                     group      ="regions",
-    #                     label      =~GEN) |>
-    #         addPolygons(data       =map_sel,
-    #                     fillColor  ="red",
-    #                     fillOpacity=0.5,
-    #                     weight     =1,
-    #                     color      ="black",
-    #                     stroke     =TRUE,
-    #                     layerId    =~DEBKG_ID,
-    #                     group      =~AGS,
-    #                     label      =~GEN) |>
-    #         hideGroup(group=map_sel[["AGS"]])
-    # }
     
-    # observe({
-    #     pop_in <- input$d_pop_in
-    #     if(!is.null(pop_in)) {
-    #         if(!(pop_in %in% c("ger_country", "custom"))) {
-    #             map_pop_in_update(pop_in)
-    #         }
-    #     }
-    # })
-    
+    ## https://stackoverflow.com/a/65935636
     ## when region is clicked on map
     ## update map_sel_regions reactive values
     ## add / remove from selectizeInput() widget
-    # observeEvent(input$map_pop_in_click, {
-    #     tmp <- 0
-    # })
+    map_sel_regions <- reactiveValues()
     
     observeEvent(input$map_pop_in_shape_click, {
-        if(input$map_pop_in_shape_click$group == "regions") {
-            d_click_id <- ld_region[[input$d_pop_in]] |>
-                dplyr::filter(OBJID %in% input$map_pop_in_shape_click$id)
-
-            map_sel_regions$groups <- c(map_sel_regions$groups,
-                                        unique(d_click_id[["AGS"]])) |>
-                unique()
+        grp <- input$map_pop_in_shape_click$group
+        if(grp != "country") {
+            if(grp == "regions") {
+                d_click_id <- ld_region[[input$d_pop_in]] |>
+                    dplyr::filter(OBJID %in% input$map_pop_in_shape_click$id)
+                
+                map_sel_regions$groups <- c(map_sel_regions$groups,
+                                            unique(d_click_id[["AGS"]])) |>
+                    unique()
+                
+                map_pop_in_proxy |>
+                    showGroup(group=unique(d_click_id[["AGS"]]))
+            } else {
+                d_click_id <- ld_region[[input$d_pop_in]] |>
+                    dplyr::filter(DEBKG_ID %in% input$map_pop_in_shape_click$id)
+                
+                map_sel_regions$groups <- setdiff(map_sel_regions$groups,
+                                                  unique(d_click_id[["AGS"]]))
+                
+                map_pop_in_proxy |>
+                    hideGroup(group=input$map_pop_in_shape_click$group)
+            }
             
-            map_pop_in_proxy |>
-                showGroup(group=unique(d_click_id[["AGS"]]))
-        } else {
-            d_click_id <- ld_region[[input$d_pop_in]] |>
-                dplyr::filter(DEBKG_ID %in% input$map_pop_in_shape_click$id)
+            d_sel_id <- ld_region[[input$d_pop_in]] |>
+                dplyr::filter(AGS %in% map_sel_regions$groups)
             
-            map_sel_regions$groups <- setdiff(map_sel_regions$groups,
-                                              unique(d_click_id[["AGS"]]))
-            
-            map_pop_in_proxy |>
-                hideGroup(group=input$map_pop_in_shape_click$group)
+            # updateSelectizeInput(session,
+            #                      inputId ="sel_pop_in_ags",
+            #                      choices =l_region_inv[[input$d_pop_in]],
+            #                      selected=unique(d_sel_id[["AGS"]]))
+            updatePickerInput(session,
+                              inputId ="sel_pop_in_ags",
+                              choices =l_region_inv[[input$d_pop_in]],
+                              selected=unique(d_sel_id[["AGS"]]))
         }
-        
-        d_sel_id <- ld_region[[input$d_pop_in]] |>
-            dplyr::filter(AGS %in% map_sel_regions$groups)
-        
-        # updateSelectizeInput(session,
-        #                      inputId ="sel_pop_in_ags",
-        #                      choices =l_region_inv[[input$d_pop_in]],
-        #                      selected=unique(d_sel_id[["AGS"]]))
-        updatePickerInput(session,
-                          inputId ="sel_pop_in_ags",
-                          choices =l_region_inv[[input$d_pop_in]],
-                          selected=unique(d_sel_id[["AGS"]]))
     })
-    
+
+    ## https://stackoverflow.com/a/65935636
     ## if regions are added / removed via the selectizeInput()
     ## update map_sel_regions reactive values
     ## widget directly, add / remove them from the map, as well
     observeEvent(input$sel_pop_in_ags, {
+        map_pop_in_proxy <- leafletProxy("map_pop_in")
         removed_via_selectInput <- setdiff(map_sel_regions$groups,
                                            input$sel_pop_in_ags)
         
@@ -203,6 +125,99 @@ server <- function(input, output, session) {
                 showGroup(group=added_via_selectInput)
         }
     }, ignoreNULL=FALSE)
+
+    observe({
+        pop_in <- input$d_pop_in
+        if(!is.null(pop_in)) {
+            if(!(pop_in %in% c("ger_country", "custom"))) {
+                map_sel <- l_map[[pop_in]]
+                map_pop_in_proxy |>
+                    clearShapes() |>
+                    # clearGroup() |>
+                    # clearControls() |>
+                    # clearMarkers() |>
+                    # addTiles() |>
+                    # setView(lng=10.5, lat=51.3, zoom=6) |>
+                    addPolygons(data       =map_sel,
+                                fillColor  ="white",
+                                fillOpacity=0.5,
+                                color      ="black",
+                                stroke     =TRUE,
+                                weight     =1,
+                                ## need different ID than other layer
+                                ## must be unique across whole map
+                                layerId    =~OBJID,
+                                group      ="regions",
+                                label      =~GEN) |>
+                    addPolygons(data       =map_sel,
+                                fillColor  ="red",
+                                fillOpacity=0.5,
+                                weight     =1,
+                                color      ="black",
+                                stroke     =TRUE,
+                                layerId    =~DEBKG_ID,
+                                group      =~AGS,
+                                label      =~GEN) |>
+                    hideGroup(group=map_sel[["AGS"]])
+            } else if(pop_in == "ger_country") {
+                map_sel <- l_map[[pop_in]]
+                map_pop_in_proxy |>
+                    clearShapes() |>
+                    addPolygons(data       =map_sel,
+                                fillColor  ="white",
+                                fillOpacity=0.5,
+                                color      ="black",
+                                stroke     =TRUE,
+                                weight     =1,
+                                group      ="country")
+            } else {
+                map_pop_in_proxy |>
+                    clearShapes()
+            }
+        }
+    })
+    
+    output$ui_target_pop_map <- renderUI({
+        if(input$exposure_target == "pop") {
+            leafletOutput("map_pop_in")
+        } else {
+            NULL
+        }
+    })
+
+    output$ui_target_pop_picker <- renderUI({
+        if((input$exposure_target == "pop") &&
+           !is.null(input$d_pop_in)         &&
+           !(input$d_pop_in %in% c("ger_country", "custom"))) {
+            region_inv <- l_region_inv[[input$d_pop_in]]
+            pickerInput(
+                inputId ="sel_pop_in_ags", 
+                label   ="Selected regions",
+                choices =region_inv,
+                selected=region_inv,
+                multiple=TRUE,
+                options =pickerOptions(
+                    actionsBox=TRUE, 
+                    size      =10,
+                    selectedTextFormat="count > 5"
+                ))
+        } else {
+            NULL
+        }
+    })
+    
+    output$ui_target_indiv <- renderUI({
+        if(input$exposure_target == "indiv") {
+            radioButtons("expo_sex",
+                         label="Sex",
+                         list("Female"="f",
+                              "Male"  ="m"),
+                         selected="f",
+                         inline=TRUE)
+        } else {
+            NULL
+        }
+    })
     
     output$ui_target_pop <- renderUI({
         if(input$exposure_target == "pop") {
@@ -222,47 +237,6 @@ server <- function(input, output, session) {
         }
     })
 
-    output$ui_target_pop_map <- renderUI({
-        if((input$exposure_target == "pop") &&
-           !is.null(input$d_pop_in)         &&
-           !(input$d_pop_in %in% c("ger_country", "custom"))) {
-            # map_sel_regions$groups <- vector()
-            region_inv <- l_region_inv[[input$d_pop_in]]
-            tagList(leafletOutput("map_pop_in"),
-                    # selectizeInput("sel_pop_in_ags",
-                    #                label="Selected regions",
-                    #                choices=region_inv,
-                    #                selected=region_inv,
-                    #                multiple=TRUE),
-                    pickerInput(
-                        inputId ="sel_pop_in_ags", 
-                        label   ="Selected regions",
-                        choices =region_inv, 
-                        selected=region_inv,
-                        multiple=TRUE,
-                        options =pickerOptions(
-                            actionsBox=TRUE, 
-                            size      =10,
-                            selectedTextFormat="count > 5"
-                        )))
-        }
-    })
-    
-    output$ui_target_pop_ags <- renderUI({
-        if((input$exposure_target == "pop") &&
-           !is.null(input$d_pop_in)         &&
-           !(input$d_pop_in %in% c("ger_country", "custom"))) {
-            region <- l_region[[input$d_pop_in]]
-            tagList(selectizeInput("sel_pop_in_ags",
-                                   label="Selected regions",
-                                   choices=region,
-                                   selected=NULL,
-                                   multiple=TRUE))
-        } else {
-            NULL
-        }
-    })
-    
     output$ui_n_expo_events <- renderUI({
         numericInput("expo_n_events",
                      label="Number of exposure events (1 / year)",
@@ -406,11 +380,11 @@ server <- function(input, output, session) {
                 
                 ui_agex_timing <- if(input$exposure_target == "indiv") {
                     numericInput(sprintf("expo_agex_timing_%.2d", expo_event_i),
-                                         label="Age at exposure",
-                                         value=20L,
-                                         min=0L,
-                                         max=99L,
-                                         step=1L)
+                                 label="Age at exposure",
+                                 value=20L,
+                                 min=0L,
+                                 max=99L,
+                                 step=1L)
                 } else if(input$exposure_target == "pop") {
                     numericInput(sprintf("expo_agex_timing_%.2d", expo_event_i),
                                  label="Year of exposure - relative to age",
@@ -421,7 +395,7 @@ server <- function(input, output, session) {
                 } else {
                     NULL
                 }
-
+                
                 l_out_i <- tagList(ui_agex_timing, ui_dr, ui_ddref, ui_dd,
                                    ui_dp1, ui_dp2,
                                    ui_dp3, ui_dp4,
@@ -433,12 +407,12 @@ server <- function(input, output, session) {
         } else {
             NULL
         }
-
-
+        
+        
         l_out <- Filter(Negate(is.null), l_out0)
         l_out
     })
-
+    
     output$ui_settings_pop_specific <- renderUI({
         if(isTRUE(input$exposure_target == "pop")) {
             tagList(checkboxInput("settings_pop_stratify_sex",
@@ -577,43 +551,41 @@ server <- function(input, output, session) {
             NULL
         } 
     })
-    
+
     output$table_lear <- DT::renderDataTable({
-        input$apply_settings
-        
-        d_lear       <- NULL
-        cols_numeric <- integer(0)
-        
+        bttn_status <- as.integer(input$apply_settings)
+
         isolate({
-            if(!is.null(input$exposure_target)) {
+            ## don't execute on initial page load
+            if((bttn_status > 0L) && !is.null(input$exposure_target)) {
                 rm      <- list(breast    =rm_breast_incid_walsh2021(),
                                 all_solid =rm_solid_incid_walsh2021(),
                                 leuk_lymph=rm_leuk_incid_walsh2021())
-                
+
                 rm_mort <- list(all_solid =rm_solid_mort_sumray(),
                                 breast    =rm_solid_incid_sumray(),
                                 leuk_lymph=rm_solid_mort_sumray())
-                
+
                 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                                     breast    =d_cancer_ger_incid_breastW_i,
                                     leuk_lymph=d_cancer_ger_incid_leuk_lymphW_i)
-                
+
                 base_cancer_mort <- list(all_solid =d_cancer_ger_mort_solidW_i,
                                          breast    =d_cancer_ger_mort_breastW_i,
                                          leuk_lymph=d_cancer_ger_mort_leuk_lymphW_i)
-                
+
                 wt_transfer <- list(all_solid =c(ERR=0.5, EAR=0.5),
                                     breast    =c(ERR=0.0, EAR=1.0),
                                     leuk_lymph=c(ERR=1.0, EAR=0.0))
-                
+
                 lat_t0 <- list(all_solid =5,
                                breast    =5,
                                leuk_lymph=1.5)
-                
+
                 lat_eta <- list(all_solid =6,
                                 breast    =6,
                                 leuk_lymph=6.75)
-                
+
                 expo_event        <- get_expo_event()
                 n_sim             <- input$settings_n_sim
                 lat_method        <- input$settings_lat_method
@@ -626,7 +598,7 @@ server <- function(input, output, session) {
                 n_cores_omit      <- input$settings_n_cores_omit
                 metric            <- input$settings_metric
                 age_max           <- input$settings_age_max
-                
+
                 if(!is.null(expo_event)) {
                     d_lear <- if(input$exposure_target == "indiv") {
                         get_lear_indiv_mc(exposure         =expo_event,
@@ -650,7 +622,7 @@ server <- function(input, output, session) {
                                           d_base_mort      =d_lifetable_ger_2024W,
                                           metric           =metric,
                                           age_max          =age_max)
-                        
+
                     } else if(input$exposure_target == "pop") {
                         stratify_sex <- isTRUE(input$settings_pop_stratify_sex)
                         pop_ref      <- input$settings_pop_pop_ref
@@ -674,27 +646,24 @@ server <- function(input, output, session) {
                                      n_cores_max      =n_cores_max,
                                      n_cores_omit     =n_cores_omit,
                                      base_cancer      =base_cancer,
-                                     # base_cancer_mort =base_cancer_mort,
+                                     base_cancer_mort =base_cancer_mort,
                                      d_base_mort      =d_lifetable_ger_2024W,
                                      metric           =metric,
-                                     age_max          =age_max)                        
+                                     age_max          =age_max)
                     }
-                    
+
                     cols_numeric <- unname(which(vapply(d_lear, is.numeric, logical(1))))
+                    DT::datatable(d_lear,
+                                  extensions=c('Buttons'),
+                                  options   =list(scrollX=TRUE,
+                                                  dom    ='Bfrtip',
+                                                  buttons=list(list(extend ='collection',
+                                                                    buttons=c('csv', 'excel'),
+                                                                    text   ='Download')))) |>
+                        DT::formatRound(columns=cols_numeric, digits=2)
                 }
             }
         })
-
-        DT::datatable(d_lear,
-                      extensions=c('Buttons', 'Scroller'),
-                      options   =list(deferRender=TRUE,
-                                      scrollX    =200,
-                                      scroller   =TRUE,
-                                      dom        ='Bfrtip',
-                                      buttons    =list(list(extend ='collection',
-                                                            buttons=c('csv', 'excel'),
-                                                            text   ='Download')))) |>
-            DT::formatRound(columns=cols_numeric, digits=2)
     })
 }
 
