@@ -55,40 +55,40 @@ server <- function(input, output, session) {
 
     ## define leaflet proxy for updating etc.
     map_pop_in_proxy <- leafletProxy("map_pop_in")
-    
+
     ## https://stackoverflow.com/a/65935636
     ## when region is clicked on map
     ## update map_sel_regions reactive values
     ## add / remove from selectizeInput() widget
     map_sel_regions <- reactiveValues()
-    
+
     observeEvent(input$map_pop_in_shape_click, {
         grp <- input$map_pop_in_shape_click$group
         if(grp != "country") {
             if(grp == "regions") {
                 d_click_id <- ld_region[[input$d_pop_in]] |>
                     dplyr::filter(OBJID %in% input$map_pop_in_shape_click$id)
-                
+
                 map_sel_regions$groups <- c(map_sel_regions$groups,
                                             unique(d_click_id[["AGS"]])) |>
                     unique()
-                
+
                 map_pop_in_proxy |>
                     showGroup(group=unique(d_click_id[["AGS"]]))
             } else {
                 d_click_id <- ld_region[[input$d_pop_in]] |>
                     dplyr::filter(DEBKG_ID %in% input$map_pop_in_shape_click$id)
-                
+
                 map_sel_regions$groups <- setdiff(map_sel_regions$groups,
                                                   unique(d_click_id[["AGS"]]))
-                
+
                 map_pop_in_proxy |>
                     hideGroup(group=input$map_pop_in_shape_click$group)
             }
-            
+
             d_sel_id <- ld_region[[input$d_pop_in]] |>
                 dplyr::filter(AGS %in% map_sel_regions$groups)
-            
+
             # updateSelectizeInput(session,
             #                      inputId ="sel_pop_in_ags",
             #                      choices =l_region_inv[[input$d_pop_in]],
@@ -108,17 +108,17 @@ server <- function(input, output, session) {
         map_pop_in_proxy <- leafletProxy("map_pop_in")
         removed_via_selectInput <- setdiff(map_sel_regions$groups,
                                            input$sel_pop_in_ags)
-        
+
         added_via_selectInput <- setdiff(input$sel_pop_in_ags,
                                          map_sel_regions$groups)
-        
+
         ## update reactive values and map
         if(length(removed_via_selectInput) > 0) {
             map_sel_regions$groups <- input$sel_pop_in_ags
             map_pop_in_proxy |>
                 hideGroup(group=removed_via_selectInput)
         }
-        
+
         if(length(added_via_selectInput) > 0) {
             map_sel_regions$groups <- input$sel_pop_in_ags
             map_pop_in_proxy |>
@@ -176,7 +176,7 @@ server <- function(input, output, session) {
             }
         }
     })
-    
+
     output$ui_target_pop_map <- renderUI({
         if(input$exposure_target == "pop") {
             leafletOutput("map_pop_in")
@@ -191,13 +191,13 @@ server <- function(input, output, session) {
            !(input$d_pop_in %in% c("ger_country", "custom"))) {
             region_inv <- l_region_inv[[input$d_pop_in]]
             pickerInput(
-                inputId ="sel_pop_in_ags", 
+                inputId ="sel_pop_in_ags",
                 label   ="Selected regions",
                 choices =region_inv,
                 selected=region_inv,
                 multiple=TRUE,
                 options =pickerOptions(
-                    actionsBox=TRUE, 
+                    actionsBox=TRUE,
                     size      =10,
                     selectedTextFormat="count > 5"
                 ))
@@ -205,7 +205,7 @@ server <- function(input, output, session) {
             NULL
         }
     })
-    
+
     output$ui_target_indiv <- renderUI({
         if(input$exposure_target == "indiv") {
             radioButtons("expo_sex",
@@ -218,7 +218,7 @@ server <- function(input, output, session) {
             NULL
         }
     })
-    
+
     output$ui_target_pop <- renderUI({
         if(input$exposure_target == "pop") {
             tagList(selectInput("d_pop_in",
@@ -245,7 +245,7 @@ server <- function(input, output, session) {
                      max=10L,
                      step=1L)
     })
-    
+
     output$ui_expo_events <- renderUI({
         n_expo_events <- input$expo_n_events
         l_out0 <- if(!is.null(n_expo_events)) {
@@ -255,18 +255,18 @@ server <- function(input, output, session) {
                                       list("Acute"  ="acute",
                                            "Chronic"="chronic"),
                                       inline=TRUE)
-                
+
                 ui_ddref <- numericInput(sprintf("expo_dose_ddref_%.2d", expo_event_i),
                                          label="DDREF",
                                          value=1,
                                          min=0.1,
                                          max=10,
                                          step=0.1)
-                
+
                 ui_dd <- selectInput(sprintf("expo_dose_distr_%.2d", expo_event_i),
                                      label="Dose distribution",
                                      as.list(rilear:::dose_distr_have))
-                
+
                 ui_dp1 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'fixed'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_fix1_%.2d", expo_event_i),
@@ -275,7 +275,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp2 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'normal'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_norm1_%.2d", expo_event_i),
@@ -290,7 +290,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp3 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'lognormal'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_lnorm1_%.2d", expo_event_i),
@@ -305,7 +305,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp4 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'triangular'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_tri1_%.2d", expo_event_i),
@@ -326,7 +326,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp5 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'logtriangular'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_ltri1_%.2d", expo_event_i),
@@ -347,7 +347,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp6 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'uniform'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_unif1_%.2d", expo_event_i),
@@ -362,7 +362,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_dp7 <- conditionalPanel(condition=sprintf("input.expo_dose_distr_%.2d == 'loguniform'", expo_event_i),
                                            #h5("Dose distribution parameter: "),
                                            numericInput(sprintf("expo_dose_param_lunif1_%.2d", expo_event_i),
@@ -377,7 +377,7 @@ server <- function(input, output, session) {
                                                         min=0,
                                                         max=3,
                                                         step=0.01))
-                
+
                 ui_agex_timing <- if(input$exposure_target == "indiv") {
                     numericInput(sprintf("expo_agex_timing_%.2d", expo_event_i),
                                  label="Age at exposure",
@@ -395,24 +395,24 @@ server <- function(input, output, session) {
                 } else {
                     NULL
                 }
-                
+
                 l_out_i <- tagList(ui_agex_timing, ui_dr, ui_ddref, ui_dd,
                                    ui_dp1, ui_dp2,
                                    ui_dp3, ui_dp4,
                                    ui_dp5, ui_dp6, ui_dp7)
-                
+
                 tagList(h4(sprintf("Exposure event %d", expo_event_i)),
                         l_out_i)
             })
         } else {
             NULL
         }
-        
-        
+
+
         l_out <- Filter(Negate(is.null), l_out0)
         l_out
     })
-    
+
     output$ui_settings_pop_specific <- renderUI({
         if(isTRUE(input$exposure_target == "pop")) {
             tagList(checkboxInput("settings_pop_stratify_sex",
@@ -428,7 +428,7 @@ server <- function(input, output, session) {
             NULL
         }
     })
-    
+
     output$ui_settings_multicore <- renderUI({
         if(isTRUE(input$settings_multicore)) {
             tagList(numericInput("settings_n_cores_max",
@@ -448,7 +448,7 @@ server <- function(input, output, session) {
             NULL
         }
     })
-    
+
     get_d_pop_in <- reactive({
         if(!is.null(input$d_pop_in)) {
             if(input$d_pop_in == "ger_country") {
@@ -477,14 +477,14 @@ server <- function(input, output, session) {
             NULL
         }
     })
-    
+
     get_expo_event <- reactive({
         get_all <- function(nn, elem, type, len) {
             vapply(seq_len(nn), function(i) {
                 input[[sprintf(paste0(elem, "_%.2d"), i)]]
             }, type(len))
         }
-        
+
         get_all_dp <- function(nn, elem, type, len) {
             lapply(seq_len(nn), function(i) {
                 p1 <- input[[sprintf(paste0("expo_dose_param_", elem, "1_%.2d"), i)]]
@@ -493,7 +493,7 @@ server <- function(input, output, session) {
                 c(p1, p2, p3)[seq_len(len)]
             })
         }
-        
+
         n <- input$expo_n_events
         if(!is.null(n)) {
             dose_rate        <- get_all(   n, "expo_dose_rate",   character, 1L)
@@ -508,7 +508,7 @@ server <- function(input, output, session) {
             dose_param_lunif <- get_all_dp(n, "lunif",            numeric,   2L)
             agex_timing      <- get_all(n,    "expo_agex_timing", numeric, 1L)
             cancer_site      <- list(c("all_solid", "leuk_lymph"))
-            
+
             l_dose_param <- list(fixed        =dose_param_fix,
                                  normal       =dose_param_norm,
                                  lognormal    =dose_param_lnorm,
@@ -516,14 +516,14 @@ server <- function(input, output, session) {
                                  logtriangular=dose_param_ltri,
                                  uniform      =dose_param_unif,
                                  loguniform   =dose_param_lunif)
-            
+
             ddrs <- vapply(seq_len(n), function(ei) {
                 input[[sprintf("expo_dose_distr_%.2d", ei)]] },
                 FUN.VALUE=character(1))
-            
+
             dose_param <- lapply(seq_along(ddrs), function(dd) {
                 l_dose_param[[ddrs[dd]]][[dd]] })
-            
+
             if(input$exposure_target == "indiv") {
                 sex <- input[["expo_sex"]]
                 gen_exposure(n          =n,
@@ -549,7 +549,7 @@ server <- function(input, output, session) {
             }
         } else {
             NULL
-        } 
+        }
     })
 
     output$table_lear <- DT::renderDataTable({
@@ -558,13 +558,13 @@ server <- function(input, output, session) {
         isolate({
             ## don't execute on initial page load
             if((bttn_status > 0L) && !is.null(input$exposure_target)) {
-                rm      <- list(breast    =rm_breast_incid_walsh2021(),
+                rml     <- list(breast    =rm_breast_incid_walsh2021(),
                                 all_solid =rm_solid_incid_walsh2021(),
                                 leuk_lymph=rm_leuk_incid_walsh2021())
 
-                rm_mort <- list(all_solid =rm_solid_mort_sumray(),
-                                breast    =rm_solid_incid_sumray(),
-                                leuk_lymph=rm_solid_mort_sumray())
+                rml_mort <- list(all_solid =rm_solid_mort_sumray(),
+                                 breast    =rm_solid_incid_sumray(),
+                                 leuk_lymph=rm_solid_mort_sumray())
 
                 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                                     breast    =d_cancer_ger_incid_breastW_i,
@@ -610,8 +610,8 @@ server <- function(input, output, session) {
                                           lat_fixed        =lat_fixed,
                                           wt_transfer_fixed=wt_transfer_fixed,
                                           ddref_fixed      =ddref_fixed,
-                                          risk_model       =rm,
-                                          risk_model_mort  =rm_mort,
+                                          risk_model       =rml,
+                                          risk_model_mort  =rml_mort,
                                           alpha            =alpha,
                                           multicore        =multicore,
                                           n_cores_max      =n_cores_max,
@@ -637,8 +637,8 @@ server <- function(input, output, session) {
                                      lat_fixed        =lat_fixed,
                                      wt_transfer_fixed=wt_transfer_fixed,
                                      ddref_fixed      =ddref_fixed,
-                                     risk_model       =rm,
-                                     risk_model_mort  =rm_mort,
+                                     risk_model       =rml,
+                                     risk_model_mort  =rml_mort,
                                      stratify_sex     =stratify_sex,
                                      pop_ref          =pop_ref,
                                      alpha            =alpha,

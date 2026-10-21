@@ -36,13 +36,13 @@ get_lear_indiv_mc <- function(exposure,
                               ...) {
   metric <- match.arg(metric, several.ok=TRUE)
   metric <- map_metric(metric)
-  
+
   ## get list of parameter sets
   dots <- list(...)
   lat_method      <- dots[["lat_method"]]
   risk_model      <- dots[["risk_model"]]
   risk_model_mort <- dots[["risk_model_mort"]] # may be NULL
-  
+
   ## random MC samples before doing parallel processing
   l_param <- gen_param_mc(exposure         =exposure,
                           n_sim            =n_sim,
@@ -62,23 +62,24 @@ get_lear_indiv_mc <- function(exposure,
           e[["agex"]] <- e[["agex_timing"]]
           e
       })
-      
+
       p
   })
-  
+
   ## for each set of parameters
   ## get lifetime excess risk estimates for whole population
   d_learW <- if(multicore) {
     n_cores <- parallelly::availableCores(logical=TRUE,
                                           max=n_cores_max,
                                           omit=n_cores_omit)
-    
+
     ## make n_cores batches of rows from population data set
     cl <- parallel::makeCluster(n_cores)
     l_param_spl <- split(l_param, seq_along(l_param) %% n_cores)
-    parallel::clusterExport(cl, "get_lear_indiv")
+    ## unnecessary with library(rilear)
+    ## parallel::clusterExport(cl, "get_lear_indiv")
     parallel::clusterEvalQ(cl, library(rilear))
-    
+
     ## collect all MC results here
     l_lear_batch <- parLapply(cl,
                               l_param_spl,
@@ -93,7 +94,7 @@ get_lear_indiv_mc <- function(exposure,
                               # base_cancer_mort=base_cancer_mort,
                               # d_base_mort     =d_base_mort,
                               ...)
-    
+
     parallel::stopCluster(cl)
     bind_rows(l_lear_batch, .id="id_batch") |>
         mutate(id_mc=interaction(.data$id_mc_in, .data$id_batch, drop=TRUE, sep="_")) |>
@@ -111,10 +112,10 @@ get_lear_indiv_mc <- function(exposure,
                        # base_cancer_mort=base_cancer_mort,
                        # d_base_mort     =d_base_mort,
                        ...)
-      
+
       bind_rows(l_lear, .id="id_mc")
   }
-  
+
   metric_arg <- metric
   d_learL <- d_learW |>
     as.data.frame() |>
@@ -124,9 +125,9 @@ get_lear_indiv_mc <- function(exposure,
             v.names  ="value",
             timevar  ="metric") |>
     mutate(metric=factor(metric, levels=seq_along(metric_arg), labels=metric_arg))
-  
+
   rownames(d_learL) <- NULL
-  
+
     ## aggregate MC results for summarizing distribution
     d_out <- if(aggr_mc) {
         d_learL |>
@@ -139,7 +140,7 @@ get_lear_indiv_mc <- function(exposure,
     } else {
         d_learL
     }
-    
+
     d_out |>
       as.data.frame()
 }

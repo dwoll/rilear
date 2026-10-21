@@ -30,13 +30,13 @@ expo_event <- gen_exposure(n          =2,
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm <- list(all_solid =rm_solid_incid_walsh2021(),
-           breast    =rm_breast_incid_walsh2021(),
-           leuk_lymph=rm_leuk_incid_walsh2021())
+rml <- list(all_solid =rm_solid_incid_walsh2021(),
+            breast    =rm_breast_incid_walsh2021(),
+            leuk_lymph=rm_leuk_incid_walsh2021())
 
-rm_mort <- list(all_solid =rm_solid_mort_sumray(),
-                breast    =rm_solid_incid_sumray(),
-                leuk_lymph=rm_solid_mort_sumray())
+rml_mort <- list(all_solid =rm_solid_mort_sumray(),
+                 breast    =rm_solid_incid_sumray(),
+                 leuk_lymph=rm_solid_mort_sumray())
 
 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                     breast    =d_cancer_ger_incid_breastW_i,
@@ -67,8 +67,8 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      lat_fixed        =FALSE,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
-                     risk_model       =rm,
-                     risk_model_mort  =rm_mort)
+                     risk_model       =rml,
+                     risk_model_mort  =rml_mort)
 
 ## without cancer mortality
 p_mc <- gen_param_mc(exposure         =expo_event,
@@ -80,7 +80,7 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      lat_fixed        =FALSE,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
-                     risk_model       =rm)
+                     risk_model       =rml)
 
 #####---------------------------------------------------------------------------
 ## solid cancer
@@ -102,10 +102,10 @@ get_lear_pop(x                =d_pop, # d_pop_frankfurt,
              lat_fixed        =FALSE,
              wt_transfer_fixed=FALSE,
              ddref_fixed      =FALSE,
-             risk_model       =rm,
-             risk_model_mort  =rm_mort,
+             risk_model       =rml,
+             risk_model_mort  =rml_mort,
              stratify_sex     =TRUE,
-             pop_ref          =100000,
+             pop_ref          =100000L,
              alpha            =0.05,
              multicore        =TRUE,
              n_cores_max      =10L,
@@ -126,4 +126,3 @@ get_lear_pop(x                =d_pop, # d_pop_frankfurt,
 #####---------------------------------------------------------------------------
 ## leukemia / lymphoma
 #####---------------------------------------------------------------------------
-

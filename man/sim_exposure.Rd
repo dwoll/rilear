@@ -20,9 +20,9 @@ sim_exposure(x, n_sim = 1L, ddref_fixed = FALSE)
           \item \code{"normal"}: A vector giving the mean and sd of the dose.
           \item \code{"lognormal"}: A vector giving the geometric mean and geometric sd of the dose.
           \item \code{"triangular"}: A vector giving the mode, minimum, and maximum dose.
-          \item \code{"logtriangular"}: A vector giving the log mode, log minimum and log maximum dose.
+          \item \code{"logtriangular"}: A vector giving the mode, minimum and maximum dose.
           \item \code{"uniform"}: A vector giving the minimum and maximum dose.
-          \item \code{"loguniform"}: A vector giving the log minimum and log maximum dose.
+          \item \code{"loguniform"}: A vector giving the minimum and maximum dose.
         }
         \item \code{dose_rate}: CAVE: Currently unused. Supported: \code{"acute"}, \code{"chronic"}.
         \item \code{ddref}: Dose- and Dose Rate Effectiveness Factor.

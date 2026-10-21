@@ -94,9 +94,9 @@ expo_event <- gen_exposure(n          =2,
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm <- list(all_solid =rm_solid_incid_walsh2021(),
-           breast    =rm_breast_incid_walsh2021(),
-           leuk_lymph=rm_leuk_incid_walsh2021())
+rml <- list(all_solid =rm_solid_incid_walsh2021(),
+            breast    =rm_breast_incid_walsh2021(),
+            leuk_lymph=rm_leuk_incid_walsh2021())
 
 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                     breast    =d_cancer_ger_incid_breastW_i,
@@ -126,7 +126,7 @@ get_lear_pop(x                =d_pop_ger_country_2024L,
              lat_fixed        =FALSE,
              wt_transfer_fixed=FALSE,
              ddref_fixed      =FALSE,
-             risk_model       =rm,
+             risk_model       =rml,
              stratify_sex     =TRUE,
              pop_ref          =100000,
              alpha            =0.05,

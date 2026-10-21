@@ -19,7 +19,7 @@ gen_exposure(n, sex = c("f", "m"), agex, timing,
   \item{dose_param}{Parameter vector to use for generating \code{n} dose values in Gy or Sv, depending on \code{dose_distr}. See \code{\link{sim_exposure}}. To specify different parameter vectors for different exposure events, create a list of parameter vectors to pass to \code{dose_param}.}
   \item{dose_rate}{CAVE: Currently unused. Supported: \code{"acute"}, \code{"chronic"}.}
   \item{ddref}{Dose and dose rate effectiveness factor.}
-  \item{cancer_site}{Relevant cancer for given exposure. See \code{\link{get_lear_indiv}}.}
+  \item{cancer_site}{Character, one or multiple names of relevant cancer sites, corresponding to exposed organs. See \code{\link{get_lear_indiv}}.}
 }
 \details{
 Recycling rules are used if fewer than \code{n} entries for arguments are provided.

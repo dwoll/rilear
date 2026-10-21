@@ -14,13 +14,13 @@ library(rilear)
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm <- list(all_solid =rm_solid_incid_walsh2021(),
-           breast    =rm_breast_incid_walsh2021(),
-           leuk_lymph=rm_leuk_incid_walsh2021())
+rml <- list(all_solid =rm_solid_incid_walsh2021(),
+            breast    =rm_breast_incid_walsh2021(),
+            leuk_lymph=rm_leuk_incid_walsh2021())
 
-rm_mort <- list(all_solid =rm_solid_mort_sumray(),
-                breast    =rm_breast_incid_walsh2021(),
-                leuk_lymph=rm_leuk_incid_walsh2021())
+rml_mort <- list(all_solid =rm_solid_mort_sumray(),
+                 breast    =rm_breast_incid_walsh2021(),
+                 leuk_lymph=rm_leuk_incid_walsh2021())
 
 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                     breast    =d_cancer_ger_incid_breastW_i,
@@ -83,12 +83,12 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
                      ##
-                     risk_model       =rm,
-                     risk_model_mort  =rm_mort)
+                     risk_model       =rml,
+                     risk_model_mort  =rml_mort)
 
 get_lear_indiv(l_param          =p_mc[[1]],
-               risk_model      =rm,
-               risk_model_mort =rm_mort,
+               risk_model      =rml,
+               risk_model_mort =rml_mort,
                base_cancer     =base_cancer,
                base_cancer_mort=base_cancer_mort,
                d_base_mort     =d_lifetable_ger_2024W,

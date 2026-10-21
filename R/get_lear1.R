@@ -2,21 +2,26 @@
 #####---------------------------------------------------------------------------
 ## get LEAR for 1 person for 1 cancer site
 ## based on total ERR / EAR over all exposure events
+## TODO
+## input validation sex, age
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 
 get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
                       sex, age_attnd, surv_base, surv_exposed,
                       agex_1st, age_max, metric) {
+    age_attnd <- as.integer(age_attnd)
+    agex_1st  <- as.integer(agex_1st)
+
     wt_transfer  <- cancer_site[["wt_transfer"]]
     idx_agex_1st <- which(age_attnd == agex_1st)
     cancer_base  <- d_base_cancer[[paste0("rate_", sex)]]
-    
+
     ## divide by survival at earliest age at exposure for conditional survival
     ## - baseline survival because no difference up to exposure
     surv_base_agex_1st <- surv_base[idx_agex_1st]
     idx_keep <- (age_attnd > agex_1st) & (age_attnd <= age_max)
-    
+
     ## functions based on ERR
     l_f_elr_err <- list(
         LEAR=function(err) {
@@ -36,7 +41,7 @@ get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
             ## in the exp(-sum(.)), see below
             (cancer_base*err)[idx_keep]
         })
-    
+
     ## functions based on EAR
     l_f_elr_ear <- list(
         LEAR=function(ear) {
@@ -55,13 +60,13 @@ get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
             ## in the exp(-sum(.)), see below
             ear[idx_keep]
         })
-    
+
     #####-----------------------------------------------------------------------
     ## excess risk at max age: sum attained age-specific excess risk over ages
     m_elr_err_ear <- vapply(metric, function(m) {
         elr_err <- sum(l_f_elr_err[[m]](err_ear[["err"]]))
         elr_ear <- sum(l_f_elr_ear[[m]](err_ear[["ear"]]))
-        
+
         if(m == "RADS") {
             c(elr_err=1-exp(-elr_err),
               elr_ear=1-exp(-elr_ear))
@@ -70,7 +75,7 @@ get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
               elr_ear=elr_ear)
         }
     }, FUN.VALUE=numeric(2))
-    
+
     ## final excess risk based on selected ERR / EAR transfer
     apply(m_elr_err_ear, MARGIN=2, FUN=weighted.mean, w=wt_transfer)
 }

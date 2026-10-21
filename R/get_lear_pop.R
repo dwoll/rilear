@@ -7,6 +7,7 @@
 
 #####---------------------------------------------------------------------------
 ## get excess lifetime risk for one row of a population data set
+## for all metrics
 ## given a single set of parameters in list l_param
 #####---------------------------------------------------------------------------
 
@@ -23,8 +24,9 @@ get_lear1_pop1 <- function(x,
                            # lat_method
                            ...) {
     stopifnot(nrow(x) == 1L)
-    
+
     if(x[["age_n"]] > age_max) {
+        rownames(x) <- NULL
         d_out <- cbind(x, site=names(l_param[["cancer_site"]]))
         d_out[metric] <- NA_real_
         d_out
@@ -46,7 +48,7 @@ get_lear1_pop1 <- function(x,
                                 # d_base_mort     =d_base_mort,
                                 # lat_method      =lat_method
                                 ...)
-        
+
         ## data frame in long format with respect to cancer site
         ## wide format with respect to metric
         bind_cols(x, m_elr)
@@ -109,23 +111,23 @@ get_lear_pop <- function(x,        # population
                          ...) {
     metric <- match.arg(metric, several.ok=TRUE)
     metric <- map_metric(metric)
-    
+
     ## get list of parameter sets
     dots <- list(...)
     lat_method      <- dots[["lat_method"]]
     risk_model      <- dots[["risk_model"]]
     risk_model_mort <- dots[["risk_model_mort"]] # may be NULL
-    
+
     ## aggregate population data over regions (AGS) if stratified
     x_aggr <- if(hasName(x, "ags")) {
         x |>
-            group_by(age_f, age_n, sex) |>
-            summarize(pop=sum(pop)) |>
+            group_by(.data$age_f, .data$age_n, .data$sex) |>
+            summarize(pop=sum(.data$pop)) |>
             ungroup()
     } else {
         x
     }
-    
+
     ## random MC samples before doing parallel processing
     l_param <- gen_param_mc(n_sim            =n_sim,
                             exposure         =exposure,
@@ -138,20 +140,21 @@ get_lear_pop <- function(x,        # population
                             ddref_fixed      =ddref_fixed,
                             risk_model       =risk_model,
                             risk_model_mort  =risk_model_mort)
-    
+
     ## for each set of parameters
     ## get lifetime excess risk estimates for whole population
     d_learW <- if(multicore) {
         n_cores <- parallelly::availableCores(logical=TRUE,
                                               max=n_cores_max,
                                               omit=n_cores_omit)
-        
+
         ## make n_cores batches of rows from population data set
         cl <- parallel::makeCluster(n_cores)
         l_param_spl <- split(l_param, seq_along(l_param) %% n_cores)
-        parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear_indiv"))
+        ## unnecessary with library(rilear)
+        ## parallel::clusterExport(cl, c("get_lear1_pop", "get_lear1_pop1", "get_lear_indiv"))
         parallel::clusterEvalQ(cl, library(rilear))
-        
+
         ## collect all MC results here
         l_lear_batch <- parLapply(cl,
                                   l_param_spl,
@@ -187,7 +190,7 @@ get_lear_pop <- function(x,        # population
                          # base_cancer_mort=base_cancer_mort,
                          # d_base_mort     =d_base_mort,
                          ...)
-        
+
         bind_rows(l_lear, .id="id_mc")
     }
 
@@ -204,20 +207,24 @@ get_lear_pop <- function(x,        # population
                 varying  =vars_var,
                 v.names  ="value",
                 timevar  ="metric") |>
+        filter(age_n <= dots[["age_max"]]) |>
         mutate(metric=factor(metric,
                              levels=seq_along(metric_arg),
                              labels=metric_arg)) |>
         mutate(cases=rbinom(n=n(), size=.data$pop, prob=.data$value))
-    
+
     rownames(d_learL) <- NULL
-    
+
+    ## remove age_n > age_max as these have undefined risk
+    ## and should not influence population-weighted estimates later
     d_pop_sex <- x_aggr |>
+        filter(age_n <= dots[["age_max"]]) |>
         group_by(.data$sex) |>
         summarize(pop_sex=sum(.data$pop)) |>
         ungroup()
-    
-    pop_total <- sum(x_aggr[["pop"]])
-    
+
+    pop_total <- sum(d_pop_sex[["pop_sex"]])
+
     ## aggregate MC results for summarizing distribution over whole population
     d_lear_out <- if(stratify_sex) {
         d_learL |>
@@ -288,7 +295,7 @@ get_lear_pop <- function(x,        # population
                    PIup_abs  =round(.data$PIup_abs)) |>
             dplyr::select("site", "metric", "pop", "pop_ref", everything())
     }
-    
+
     d_lear_out |>
         as.data.frame()
 }

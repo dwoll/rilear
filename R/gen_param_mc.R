@@ -25,18 +25,18 @@ gen_param_mc <- function(exposure,
     } else {
         NULL
     }
-    
+
     #####-----------------------------------------------------------------------
     ## for each exposure event: dose, ddref
     ## add sex, agex / timing, dose_rate, cancer site list
     #####-----------------------------------------------------------------------
-    
-    l_expo_mc <- lapply(exposure, sim_exposure, n_sim=n_sim)
+
+    l_expo_mc <- lapply(exposure, sim_exposure, n_sim=n_sim, ddref_fixed=ddref_fixed)
 
     #####-----------------------------------------------------------------------
     ## for each cancer site: risk model coefficients, ERR-EAR transfer, latency
     #####-----------------------------------------------------------------------
-    
+
     ## get all cancer sites
     cancer_sites <- lapply(exposure, function(e) { e[["cancer_site"]] }) |>
         unlist() |>
@@ -45,23 +45,23 @@ gen_param_mc <- function(exposure,
     l_cancer_site_mc <- lapply(cancer_sites, function(cs) {
         ## cancer site name
         cs_mc <- rep(cs, n_sim)
-        
+
         #####-----------------------------------------------------------------------
         ## risk model parameters
         beta_err_mc <- mvtnorm::rmvnorm(n    =n_sim,
                                         mean =risk_model[[cs]][["err"]][["param"]],
                                         sigma=risk_model[[cs]][["err"]][["varm"]])
-        
+
         beta_ear_mc <- mvtnorm::rmvnorm(n    =n_sim,
                                         mean =risk_model[[cs]][["ear"]][["param"]],
                                         sigma=risk_model[[cs]][["ear"]][["varm"]])
-        
+
         ## cancer mortality model for REID / REIC, ELR, RADS
         if(!is.null(rmm)) {
             beta_err_mort_mc <- mvtnorm::rmvnorm(n    =n_sim,
                                                  mean =rmm[[cs]][["err"]][["param"]],
                                                  sigma=rmm[[cs]][["err"]][["varm"]])
-            
+
             beta_ear_mort_mc <- mvtnorm::rmvnorm(n    =n_sim,
                                                  mean =rmm[[cs]][["ear"]][["param"]],
                                                  sigma=rmm[[cs]][["ear"]][["varm"]])
@@ -69,7 +69,7 @@ gen_param_mc <- function(exposure,
             beta_err_mort_mc <- NULL
             beta_ear_mort_mc <- NULL
         }
-        
+
         #####-----------------------------------------------------------------------
         ## weights for ERR-EAR transfer of risk
         ## TODO
@@ -92,13 +92,13 @@ gen_param_mc <- function(exposure,
             beta_beta  <- (1-norm_mean) * ((norm_mean*(1-norm_mean) / norm_var)-1)
             rbeta(n_sim, shape1=beta_alpha, shape2=beta_beta)
         }
-        
+
         stopifnot(all(wt_transfer_err >= 0),
                   all(wt_transfer_err <= 1))
-        
+
         wt_transfer_mc <- cbind(ERR=  wt_transfer_err,
                                 EAR=1-wt_transfer_err)
-        
+
         #####-----------------------------------------------------------------------
         ## latency function
         ## TODO RadRAT
@@ -117,13 +117,13 @@ gen_param_mc <- function(exposure,
             # } else {
             #     rep(lat_eta, n_sim)
             # }
-            
+
             # if(missing(lat_t0)) {
             #     val_t0 <- c(ProZES_solid     =4,
             #                 ProZES_leuk_lymph=1.5,
             #                 RadRAT_solid     =7.5,
             #                 RadRAT_leuk_lymph=2.25)[paste(lat_method, cancer, sep="_")]
-            #     
+            #
             #     rep(unname(val_t0), n_sim)
             # } else {
             #     rep(lat_t0, n_sim)
@@ -140,10 +140,10 @@ gen_param_mc <- function(exposure,
             #     list(solid     =c(min=5, max=10),
             #          leuk_lymph=c(min=1, max=3.5))[[cancer]]
             # }
-            # 
+            #
             # lat_t0_mc <- runif(n_sim, min=val_t0["min"], max=val_t0["max"])
         }
-        
+
         l_cs0 <- list(cancer_site   =cs_mc,
                       param_err     =beta_err_mc,
                       param_ear     =beta_ear_mc,
@@ -152,10 +152,10 @@ gen_param_mc <- function(exposure,
                       wt_transfer   =wt_transfer_mc,
                       lat_t0        =lat_t0_mc,
                       lat_eta       =lat_eta_mc)
-        
+
         Filter(Negate(is.null), l_cs0)
     })
-    
+
     #####-----------------------------------------------------------------------
     ## join simulated parameters into list
     ## hierarchy (out -> in):
@@ -172,10 +172,10 @@ gen_param_mc <- function(exposure,
                     l_expo_mc[[i]][[j]][[k]]
                 }
             })
-            
+
             setNames(l, names_expo)
         })
-        
+
         l_cancer_site <- lapply(seq_along(cancer_sites), function(i) {
             l <- lapply(names_cs, function(j) {
                 if(inherits(l_cancer_site_mc[[i]][[j]], "matrix") ||
@@ -185,13 +185,13 @@ gen_param_mc <- function(exposure,
                     l_cancer_site_mc[[i]][[j]][[k]]
                 }
             })
-            
+
             setNames(l, names_cs)
         })
-        
+
         list(exposure   =l_exposure,
              cancer_site=setNames(l_cancer_site, cancer_sites))
     })
-    
+
     l_param
 }

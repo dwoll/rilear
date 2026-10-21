@@ -48,13 +48,13 @@ sim_exposure(x=list(sex="f", agex=20, dose_param=0.5),
 
 ## generate sets of parameter settings
 ## with cancer mortality
-rm      <- list(all_solid =rm_solid_incid_walsh2021(),
-                breast    =rm_breast_incid_walsh2021(),
-                leuk_lymph=rm_leuk_incid_walsh2021())
+rml      <- list(all_solid =rm_solid_incid_walsh2021(),
+                 breast    =rm_breast_incid_walsh2021(),
+                 leuk_lymph=rm_leuk_incid_walsh2021())
 
-rm_mort <- list(all_solid =rm_solid_mort_sumray(),
-                breast    =rm_solid_incid_sumray(),
-                leuk_lymph=rm_solid_mort_sumray())
+rml_mort <- list(all_solid =rm_solid_mort_sumray(),
+                 breast    =rm_solid_incid_sumray(),
+                 leuk_lymph=rm_solid_mort_sumray())
 
 p_mc <- gen_param_mc(exposure         =expo_event,
                      n_sim            =10L,
@@ -72,8 +72,8 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
                      ##
-                     risk_model       =rm,
-                     risk_model_mort  =rm_mort)
+                     risk_model       =rml,
+                     risk_model_mort  =rml_mort)
 
 #####---------------------------------------------------------------------------
 ## solid incidence, lifetable, Walsh2021 model
@@ -118,8 +118,8 @@ get_lear_indiv_mc(exposure         =expo_event,
                   lat_fixed        =FALSE,
                   wt_transfer_fixed=FALSE,
                   ddref_fixed      =FALSE,
-                  risk_model       =rm,
-                  risk_model_mort  =rm_mort,
+                  risk_model       =rml,
+                  risk_model_mort  =rml_mort,
                   alpha            =0.05,
                   multicore        =FALSE,
                   n_cores_max      =10L,

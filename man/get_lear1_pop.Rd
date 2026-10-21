@@ -28,9 +28,9 @@ CAVE: All calculations preliminary, not yet validated!
 \code{\link{d_pop_ger_fedstate_2024L}}
 }
 \examples{
-rm <- list(all_solid =rm_solid_incid_walsh2021(),
-           breast    =rm_breast_incid_walsh2021(),
-           leuk_lymph=rm_leuk_incid_walsh2021())
+rml <- list(all_solid =rm_solid_incid_walsh2021(),
+            breast    =rm_breast_incid_walsh2021(),
+            leuk_lymph=rm_leuk_incid_walsh2021())
 
 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                     breast    =d_cancer_ger_incid_breastW_i,
@@ -67,7 +67,7 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      lat_fixed        =FALSE,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
-                     risk_model       =rm)
+                     risk_model       =rml)
 
 ## solid cancer risk estimates
 ## for exposure of the population of Germany

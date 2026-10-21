@@ -33,7 +33,7 @@ gen_param_mc(exposure, n_sim = 1000L,
   \item{lat_fixed}{Set latency parameters \code{lat_t0} and \code{lat_eta} to a fixed value without uncertainty?}
   \item{wt_transfer_fixed}{Set \code{wt_transfer} weights to a fixed value without uncertainty?}
   \item{ddref_fixed}{Set \code{ddref} Dose- and Dose-Rate Effectiveness Factor to a fixed value without uncertainty?}
-  \item{risk_model}{A named list with one component for each cancer site. Definition of ERR and EAR risk models. Cancer sites must correspond to \code{l_param[["cancer_site"]]} and components of \code{base_cancer}. For an example of a risk model for a single cancer site, see \code{\link{rm_solid_incid_walsh2021}}.}
+  \item{risk_model}{A named list with one component for each cancer site. Definition of ERR and EAR risk models. Cancer sites must correspond to those in \code{exposure} and components of \code{wt_transfer}. For an example of a risk model for a single cancer site, see \code{\link{rm_solid_incid_walsh2021}}.}
   \item{risk_model_mort}{Only necessary for \code{metric} \code{"REID"} / \code{"REIC"}, \code{"ELR"}. A named list like \code{risk_model} defining ERR and EAR risk models for cancer mortality. For an example, see \code{\link{rm_solid_mort_sumray}}.}
 }
 \details{
@@ -75,13 +75,13 @@ A list with one component for each simulated parameter set. Each such component 
 \code{\link{get_lear_pop}}
 }
 \examples{
-rm <- list(all_solid =rm_solid_incid_walsh2021(),
-           breast    =rm_breast_incid_walsh2021(),
-           leuk_lymph=rm_leuk_incid_walsh2021())
+rml <- list(all_solid =rm_solid_incid_walsh2021(),
+            breast    =rm_breast_incid_walsh2021(),
+            leuk_lymph=rm_leuk_incid_walsh2021())
 
-rm_mort <- list(all_solid =rm_solid_mort_sumray(),
-                breast    =rm_breast_incid_walsh2021(),
-                leuk_lymph=rm_leuk_incid_walsh2021())
+rml_mort <- list(all_solid =rm_solid_mort_sumray(),
+                 breast    =rm_breast_incid_walsh2021(),
+                 leuk_lymph=rm_leuk_incid_walsh2021())
 
 base_cancer <- list(all_solid =d_cancer_ger_incid_solidW_i,
                     breast    =d_cancer_ger_incid_breastW_i,
@@ -122,8 +122,8 @@ p_mc <- gen_param_mc(exposure         =expo_event,
                      lat_fixed        =FALSE,
                      wt_transfer_fixed=FALSE,
                      ddref_fixed      =FALSE,
-                     risk_model       =rm,
-                     risk_model_mort  =rm_mort)
+                     risk_model       =rml,
+                     risk_model_mort  =rml_mort)
 
 p_mc[[1]]
 }
