@@ -74,8 +74,8 @@ get_lear1 <- function(cancer_site, err_ear, d_base_cancer,
             c(elr_err=elr_err,
               elr_ear=elr_ear)
         }
-    }, FUN.VALUE=numeric(2))
+    }, FUN.VALUE=numeric(2L))
 
     ## final excess risk based on selected ERR / EAR transfer
-    apply(m_elr_err_ear, MARGIN=2, FUN=weighted.mean, w=wt_transfer)
+    apply(m_elr_err_ear, MARGIN=2L, FUN=weighted.mean, w=wt_transfer)
 }

@@ -37,7 +37,7 @@ gen_param_mc <- function(exposure,
     ## for each cancer site: risk model coefficients, ERR-EAR transfer, latency
     #####-----------------------------------------------------------------------
 
-    ## get all cancer sites
+    ## get all cancer sites (possibly multiple per exposure)
     cancer_sites <- lapply(exposure, function(e) { e[["cancer_site"]] }) |>
         unlist() |>
         unique()
@@ -111,7 +111,7 @@ gen_param_mc <- function(exposure,
         # val_eta <- c(solid=6.25, leuk_lymph=7.66)[cancer]
         lat_eta_mc <- rep(lat_eta[[cs]], n_sim) # no uncertainty in eta
         lat_t0_mc  <- if(lat_fixed) {
-            rep(lat_t0[[cs]],  n_sim)
+            rep(lat_t0[[cs]], n_sim)
             # if(missing(lat_eta)) {
             #     rep(unname(val_eta), n_sim)
             # } else {
@@ -159,7 +159,7 @@ gen_param_mc <- function(exposure,
     #####-----------------------------------------------------------------------
     ## join simulated parameters into list
     ## hierarchy (out -> in):
-    ## MC run -> exposure no. -> dose, ... | site -> coef, wt_transfer, ...
+    ## MC run -> exposure number -> dose, ... | site -> coef, wt_transfer, ...
     l_param <- lapply(seq_len(n_sim), function(k) {
         names_expo <- unlist(unique(lapply(l_expo_mc, names)))
         names_cs   <- unlist(unique(lapply(l_cancer_site_mc, names)))

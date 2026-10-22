@@ -25,7 +25,7 @@ get_lear_indiv_mc <- function(exposure,
                               n_cores_max      =10L,
                               n_cores_omit     =2L,
                               aggr_mc          =TRUE,
-                              ## passed throught to get_lear1()
+                              ## passed through to get_lear1()
                               # age_max,
                               # lat_method       =c("ProZES", "RadRAT"),
                               # base_cancer,
@@ -67,13 +67,13 @@ get_lear_indiv_mc <- function(exposure,
   })
 
   ## for each set of parameters
-  ## get lifetime excess risk estimates for whole population
+  ## get lifetime excess risk estimates
   d_learW <- if(multicore) {
     n_cores <- parallelly::availableCores(logical=TRUE,
                                           max=n_cores_max,
                                           omit=n_cores_omit)
 
-    ## make n_cores batches of rows from population data set
+    ## make n_cores batches from set of parameters
     cl <- parallel::makeCluster(n_cores)
     l_param_spl <- split(l_param, seq_along(l_param) %% n_cores)
     ## unnecessary with library(rilear)

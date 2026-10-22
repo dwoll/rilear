@@ -1,6 +1,7 @@
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 ## simulate radiation dose for exposure events
+## based on different distributions
 #####---------------------------------------------------------------------------
 #####---------------------------------------------------------------------------
 
@@ -8,6 +9,8 @@
 ## random variates from a - possibly asymmetric - triangular distribution
 ## based on code by Robert Carnell
 ## https://github.com/bertcarnell/triangle/blob/master/R/rtriangle.r
+## TODO
+## input validation t_min < t_mode < t_max
 #####---------------------------------------------------------------------------
 
 dw_rtri <- function(n, t_mode, t_min, t_max) {
@@ -67,7 +70,7 @@ sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE) {
     ddref <- if(hasName(x, "ddref")) {
         x[["ddref"]]
     } else {
-        1
+        1.0
     }
 
     cancer_site <- if(hasName(x, "cancer_site")) {
@@ -145,7 +148,7 @@ sim_exposure <- function(x, n_sim=1L, ddref_fixed=FALSE) {
 
     #####-----------------------------------------------------------------------
     ## dose rate and cancer site
-    dose_rate_mc   <- rep(dose_rate,   n_sim)
+    dose_rate_mc   <- rep(dose_rate, n_sim)
     cancer_site_mc <- if(inherits(cancer_site, "list")) {
         rep(cancer_site, n_sim)
     } else {
